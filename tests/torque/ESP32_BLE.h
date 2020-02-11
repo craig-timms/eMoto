@@ -45,23 +45,46 @@ WidgetLCD lcd(VP_LCD);
 // Go to the Project Settings (nut icon).
 char auth[] = "CnlLxWoZB2RbuKdGGiEIObOokHatLA2T";
 
-int RPM = 0;
+int gRPM = 0;
 int gCurrent = 0;
 int gVoltage = 0;
 int gInvTemp = 0;
 char gErr[17] = "";
+int Button1 = 0;
+int Button2 = 0;
+int slider = 0;
+
+void BLE_writeGauges()
+{
+  Blynk.virtualWrite(VP_RPM, gRPM);
+  Blynk.virtualWrite(VP_I, gCurrent);
+  Blynk.virtualWrite(VP_V, gVoltage);
+  Blynk.virtualWrite(VP_T, gInvTemp);
+//  Serial.println("SENT");
+
+  // if (i >= 400) i = 0;
+  // if (n >= 6000) n = 0;
+  // if (v >= 67) v = 54;
+  // if (t >= 100) t = 0;
+
+  String lcdText = "Good";
+  if (gVoltage < 60) lcdText = "Bad ";
+  lcd.print(0,0, "Voltage: ");
+  lcd.print(0,1, lcdText);
+}
 
 void BLE_setup()
 {
   // Debug console
   Serial.println("Waiting for connections...");
-  Blynk.setDeviceName("Blynk");
+  Blynk.setDeviceName("eMoto");
   Blynk.begin(auth);
-  timer.setInterval(100L, writeGauges);
+  timer.setInterval(100L, BLE_writeGauges);
   lcd.clear();
+//  delay(1000);
 }
 
-void BLE_update( int tRPM, int tCurrent, int tVoltage, int tItemp );
+void BLE_update( int tRPM, int tCurrent, int tVoltage, int tItemp )
 {
   gRPM = tRPM;
   gCurrent = tCurrent;
@@ -72,38 +95,19 @@ void BLE_update( int tRPM, int tCurrent, int tVoltage, int tItemp );
   timer.run();
 }
 
-void BLE_writeGauges()
-{
-  Blynk.virtualWrite(VP_RPM, RPM);
-  Blynk.virtualWrite(VP_I, current);
-  Blynk.virtualWrite(VP_V, voltage);
-  Blynk.virtualWrite(VP_T, invTemp);
-//  Serial.println("SENT");
-
-  // if (i >= 400) i = 0;
-  // if (n >= 6000) n = 0;
-  // if (v >= 67) v = 54;
-  // if (t >= 100) t = 0;
-
-  String lcdText = "Good";
-  if (v < 60) lcdText = "Bad ";
-  lcd.print(0,0, "Voltage: ");
-  lcd.print(0,1, lcdText);
-}
-
 BLYNK_WRITE(VP_B1)
 {
-  B1 = param.asInt(); // assigning incoming value from pin V1 to a variable
+  Button1 = param.asInt(); // assigning incoming value from pin V1 to a variable
 
   // process received value
   Serial.print("Button 1 changed to: ");
-  Serial.print(B1);
+  Serial.print(Button1);
   Serial.println();
 }
 
 BLYNK_WRITE(VP_B2)
 {
-  B2 = param.asInt(); // assigning incoming value from pin V1 to a variable
+  Button2 = param.asInt(); // assigning incoming value from pin V1 to a variable
   lcd.clear();
 }
 

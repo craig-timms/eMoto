@@ -12,14 +12,16 @@ void setup()
   //module setup
   motor.setup();
 
+  delay(500);
   BLE_setup();
 
-  delay(100); // pause for stuff to stabilize
+  delay(500); // pause for stuff to stabilize
 }
 
 void loop() {
 
   motor.service();
-  BLE_update( motor.getRPM(), motor.getCurrent(), motor.getVoltage(), motor.getTempInv() )
+//  delay(10);
+  BLE_update( motor.getRPM(), motor.getCurrent(), motor.getVoltage(), motor.getTempInv() );
 
 }
