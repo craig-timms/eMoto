@@ -5,11 +5,12 @@
 #include <ESP32CAN.h>
 #include <CAN_config.h>
 
-#define CANtx = 17;
-#define CANrx = 16;
-#define GPIO_throttleIN = 39;   // throttle
-#define GPIO_keyIN = 36;        // throttle
-#define GPIO_throttleOUT = 23;  // throttle
+#define CANtx 17
+#define CANrx 16
+#define GPIO_throttleIN 39   // throttle
+#define GPIO_keyIN 36        // throttle
+#define GPIO_throttleOUT 23  // throttle
+CAN_device_t CAN_cfg;
 
 class Motor
 {
@@ -26,7 +27,7 @@ class Motor
         int getTempInv( void )          { return tempInv; }
         int getState( void )            { return statusCmd; }
         // TODO: function to make sure set cmd == fb state
-        char getErrors( void )          { return ERR; }
+//        char getErrors( void )          { return ERR; }
 
     private:
 
@@ -34,7 +35,7 @@ class Motor
         int readThrottle( void );          // read ADC (0-1000)
         void writeThrottle( void );         // send to motor (0-1000)
 
-        CAN_device_t CAN_cfg;               // CAN Config
+        // CAN_device_t CAN_cfg;               // CAN Config
         unsigned long previousMillis = 0;   // will store last time a CAN Message was send
         const int interval = 1000;          // interval at which send CAN Messages (milliseconds)
         const int rx_queue_size = 10;       // Receive Queue size
@@ -55,6 +56,6 @@ class Motor
         int voltageDC = 0;
         char ERR[ 16 + 1 ];
 
-}
+};
 
 #endif MOTOR_H

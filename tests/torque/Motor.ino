@@ -38,13 +38,13 @@ Motor::service( void )
     writeThrottle();
 }
 
-void
+int
 Motor::readThrottle( void )
 {
   throttleIN = (analogRead(GPIO_throttleIN)-630) * 1000 / (4095-630);
   if (throttleIN<0) { throttleIN = 0; }
   throttleOUT = (throttleIN*4095)/1000;
-  Serial.println("Throttle GOT");
+//  Serial.println("Throttle GOT");
 
   return throttleOUT;
 }
@@ -53,11 +53,11 @@ void
 Motor::writeThrottle( void )
 {
     ledcWrite(0, throttleOUT);
-    Serial.println("Throttle SET");
+//    Serial.println("Throttle SET");
 }
 
 void
-Moror::readCAN( void ) 
+Motor::readCAN( void ) 
 {
   
   CAN_frame_t rx_frame;
@@ -229,4 +229,3 @@ Moror::readCAN( void )
 //     Serial.println("SENT");
 //   }
 }
-
