@@ -19,6 +19,26 @@ Motor::setup( void )
 }
 
 void
+Motor::restart( void )
+{
+    // TODO
+}
+
+void
+Motor::service( void )
+{
+    // TODO
+    // if (not working) restart;
+
+    // TODO
+    // if (error) writeThrottle(0);
+
+    readThrottle();
+    readCAN();
+    writeThrottle();
+}
+
+void
 Motor::readThrottle( void )
 {
   throttleIN = (analogRead(GPIO_throttleIN)-630) * 1000 / (4095-630);
@@ -37,7 +57,7 @@ Motor::writeThrottle( void )
 }
 
 void
-Moror::read( void ) 
+Moror::readCAN( void ) 
 {
   
   CAN_frame_t rx_frame;

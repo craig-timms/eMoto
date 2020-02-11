@@ -14,11 +14,11 @@
 class Motor
 {
     public:
-        void setup( void );
+        void setup( void );             // Done
         void restart( void );
         void service( void );
 
-        int getThrottle( void )        {return throttleOUT; }      // returns (0-1000)
+        int getThrottle( void )         {return throttleOUT; }      // returns (0-1000)
         int getRPM( void )              { return RPM; }
         int getCurrent( void )          { return currentMtr; }
         int getVoltage( void )          { return voltageDC; }
@@ -30,7 +30,7 @@ class Motor
 
     private:
 
-        void read( void );
+        void readCAN( void );
         int readThrottle( void );          // read ADC (0-1000)
         void writeThrottle( void );         // send to motor (0-1000)
 
