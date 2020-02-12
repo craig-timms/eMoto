@@ -4,6 +4,9 @@
 
 Motor motor;
 
+unsigned long delayStart = 0;
+unsigned long delay_ms = 200;
+
 void setup() 
 {
   //debug serial ouput
@@ -14,6 +17,7 @@ void setup()
 
   delay(500);
   BLE_setup();
+  delayStart = millis();
 
   delay(500); // pause for stuff to stabilize
 }
@@ -22,6 +26,14 @@ void loop() {
 
   motor.service();
 //  delay(10);
-  BLE_update( motor.getRPM(), motor.getCurrent(), motor.getVoltage(), motor.getTempInv() );
-
+  if ( millis() > delayStart + delay_ms ) {
+    
+//    Serial.print("Time since BT send: ");
+//    Serial.print(millis()-delayStart);
+//    Serial.println();
+    
+    BLE_update( motor.getRPM(), motor.getCurrent(), motor.getVoltage(), motor.getTempInv() );
+    delayStart = millis();
+  }
+  
 }

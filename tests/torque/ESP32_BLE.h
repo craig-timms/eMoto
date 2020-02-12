@@ -38,6 +38,9 @@
 #define VP_B2 6
 #define VP_SLD 7
 
+unsigned long BLEtime = 0;
+//unsigned long BLEtime_diff = 0;
+
 BlynkTimer timer;
 WidgetLCD lcd(VP_LCD);
 
@@ -79,7 +82,7 @@ void BLE_setup()
   Serial.println("Waiting for connections...");
   Blynk.setDeviceName("eMoto");
   Blynk.begin(auth);
-  timer.setInterval(100L, BLE_writeGauges);
+//  timer.setInterval(100L, BLE_writeGauges);
   lcd.clear();
 //  delay(1000);
 }
@@ -92,7 +95,12 @@ void BLE_update( int tRPM, int tCurrent, int tVoltage, int tItemp )
   gInvTemp = tItemp;
 
   Blynk.run();
-  timer.run();
+//  timer.run();
+  BLE_writeGauges();
+//  BLEtime = millis() - BLEtime;
+//  Serial.print("BLE time: ");
+//  Serial.print(BLEtime);
+//  Serial.println();
 }
 
 BLYNK_WRITE(VP_B1)
