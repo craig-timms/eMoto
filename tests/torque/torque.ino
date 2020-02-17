@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include "Motor.h"
+Motor motor;
+
 #include "ESP32_BLE.h"
 
-Motor motor;
 
 unsigned long delayStart = 0;
 unsigned long delay_ms = 200;

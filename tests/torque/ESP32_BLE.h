@@ -113,15 +113,17 @@ BLYNK_WRITE(VP_B1)
 {
   Button1 = param.asInt(); // assigning incoming value from pin V1 to a variable
   if ( Button1 == 0 ) {
+    Serial.println("Turn-off initiated");
     motor.setHV( 3 );
   } else if ( Button1 == 1 ) {
+    Serial.println("Turn-on initiated");
     motor.setHV( 1 );
   }
 
   // process received value
-  Serial.print("Button 1 changed to: ");
-  Serial.print(Button1);
-  Serial.println();
+//  Serial.print("Button 1 changed to: ");
+//  Serial.print(Button1);
+//  Serial.println();
 }
 
 BLYNK_WRITE(VP_B2)

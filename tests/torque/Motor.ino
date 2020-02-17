@@ -23,6 +23,8 @@ Motor::setup( void )
   digitalWrite(GPIO_contactor, LOW);
   digitalWrite(GPIO_discharge, LOW);
   HVcntrlTimer = millis();
+
+  delay(400);
   
   Serial.println("CAN Setup -- Finished");
 }
@@ -32,15 +34,20 @@ Motor::setHV( int cmdHV )
 {
     HVstatus = cmdHV;
     if ( cmdHV == 1 ) { // turn-on
+//      Serial.println("Confirmed -- turn-on");
       digitalWrite(GPIO_discharge, LOW);
       digitalWrite(GPIO_contactor, LOW);
       digitalWrite(GPIO_precharge, HIGH);
       HVcntrlTimer = millis();
+      delay(200);
     } else if ( cmdHV == 3 ) { // turn-off
+//      Serial.println("Confirmed -- turn-off");
       digitalWrite(GPIO_discharge, LOW);
       digitalWrite(GPIO_precharge, LOW);
       digitalWrite(GPIO_contactor, LOW);
       HVcntrlTimer = millis();
+      delay(200);
+      digitalWrite(GPIO_discharge, HIGH);      
     }
 }
 
@@ -54,13 +61,18 @@ Motor::HVcontrol( void )
   } else if ( (HVstatus == 1 ) && (millis() > HVcntrlTimer + HVonHoldoff) ) {    
     digitalWrite(GPIO_contactor, HIGH);
     digitalWrite(GPIO_precharge, LOW);
+    Serial.println("HV on");
     HVstatus = 2;
-  } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + 1000) ) {
-    digitalWrite(GPIO_discharge, HIGH);
-    HVstatus = 0;
+    delay(100);
+//  } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + 1000) ) {
+//    digitalWrite(GPIO_discharge, HIGH);
+//    Serial.println("Bleedin");
+//    delay(10);
   } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + HVoffHoldoff) ) {
     digitalWrite(GPIO_discharge, LOW);
-    HVstatus = 3;
+    HVstatus = 0;
+    Serial.println("HV off");
+    delay(100);
   }
 
 }

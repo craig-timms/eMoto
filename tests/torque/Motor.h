@@ -10,9 +10,9 @@
 #define GPIO_throttleIN 39      // throttle
 #define GPIO_keyIN 36           // throttle
 #define GPIO_throttleOUT 23     // throttle
-#define GPIO_precharge 35       // HV control
+#define GPIO_precharge 0       // HV control
 #define GPIO_contactor 21       // HV control
-#define GPIO_discharge 34       // HV control
+#define GPIO_discharge 4       // HV control
 CAN_device_t CAN_cfg;
 
 class Motor
@@ -25,7 +25,7 @@ class Motor
         void setHV( int );          // 0-off 1-ton 2-on 3-toff
         void getHV( void );
 
-        int getThrottle( void )         {return throttleOUT; }      // returns (0-1000)
+        int getThrottle( void )         { return throttleOUT; }      // returns (0-1000)
         int getRPM( void )              { return RPM; }
         int getCurrent( void )          { return currentMtr; }
         int getVoltage( void )          { return voltageDC; }
