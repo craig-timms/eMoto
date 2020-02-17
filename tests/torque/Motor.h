@@ -7,9 +7,12 @@
 
 #define CANtx 17
 #define CANrx 16
-#define GPIO_throttleIN 39   // throttle
-#define GPIO_keyIN 36        // throttle
-#define GPIO_throttleOUT 23  // throttle
+#define GPIO_throttleIN 39      // throttle
+#define GPIO_keyIN 36           // throttle
+#define GPIO_throttleOUT 23     // throttle
+#define GPIO_precharge 35       // HV control
+#define GPIO_contactor 21       // HV control
+#define GPIO_discharge 34       // HV control
 CAN_device_t CAN_cfg;
 
 class Motor
@@ -18,6 +21,9 @@ class Motor
         void setup( void );             // Done
         void restart( void );
         void service( void );
+
+        void setHV( int );          // 0-off 1-ton 2-on 3-toff
+        void getHV( void );
 
         int getThrottle( void )         {return throttleOUT; }      // returns (0-1000)
         int getRPM( void )              { return RPM; }
@@ -34,6 +40,7 @@ class Motor
         void readCAN( void );
         int readThrottle( void );          // read ADC (0-1000)
         void writeThrottle( void );         // send to motor (0-1000)
+        void HVcontrol( void );         // 
 
         // CAN_device_t CAN_cfg;               // CAN Config
         unsigned long previousMillis = 0;   // will store last time a CAN Message was send
@@ -55,6 +62,12 @@ class Motor
         int currentMtr = 0;
         int voltageDC = 0;
         char ERR[ 16 + 1 ];
+        int HVstatus = 0;
+
+        
+        unsigned long HVcntrlTimer = 0;
+        unsigned long HVonHoldoff = 5000;
+        unsigned long HVoffHoldoff = 5000;
 
 };
 

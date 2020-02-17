@@ -25,13 +25,9 @@ void setup()
 void loop() {
 
   motor.service();
-//  delay(10);
-  if ( millis() > delayStart + delay_ms ) {
-    
-//    Serial.print("Time since BT send: ");
-//    Serial.print(millis()-delayStart);
-//    Serial.println();
-    
+  
+  // Bluetooth update every 200 ms
+  if ( millis() > delayStart + delay_ms ) {    
     BLE_update( motor.getRPM(), motor.getCurrent(), motor.getVoltage(), motor.getTempInv() );
     delayStart = millis();
   }

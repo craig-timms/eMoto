@@ -84,6 +84,12 @@ void BLE_setup()
   Blynk.begin(auth);
 //  timer.setInterval(100L, BLE_writeGauges);
   lcd.clear();
+  Blynk.virtualWrite(VP_B1, LOW);
+  Blynk.virtualWrite(VP_B2, LOW);
+  Blynk.virtualWrite(VP_RPM, 6000);
+  Blynk.virtualWrite(VP_I, 400);
+  Blynk.virtualWrite(VP_V, 68);
+  Blynk.virtualWrite(VP_T, 100);
 //  delay(1000);
 }
 
@@ -106,6 +112,11 @@ void BLE_update( int tRPM, int tCurrent, int tVoltage, int tItemp )
 BLYNK_WRITE(VP_B1)
 {
   Button1 = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if ( Button1 == 0 ) {
+    motor.setHV( 3 );
+  } else if ( Button1 == 1 ) {
+    motor.setHV( 1 );
+  }
 
   // process received value
   Serial.print("Button 1 changed to: ");

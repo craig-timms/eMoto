@@ -14,8 +14,55 @@ Motor::setup( void )
   // throttle pin config
   ledcSetup(0, 10000, 12);              // Config PWM output (dunno, frequency, bits)
   ledcAttachPin(GPIO_throttleOUT, 0);   // Config throttle out pin
+
+  // HV control config
+  pinMode(GPIO_precharge, OUTPUT);
+  pinMode(GPIO_contactor, OUTPUT);
+  pinMode(GPIO_discharge, OUTPUT);
+  digitalWrite(GPIO_precharge, LOW);
+  digitalWrite(GPIO_contactor, LOW);
+  digitalWrite(GPIO_discharge, LOW);
+  HVcntrlTimer = millis();
   
   Serial.println("CAN Setup -- Finished");
+}
+
+void
+Motor::setHV( int cmdHV )
+{
+    HVstatus = cmdHV;
+    if ( cmdHV == 1 ) { // turn-on
+      digitalWrite(GPIO_discharge, LOW);
+      digitalWrite(GPIO_contactor, LOW);
+      digitalWrite(GPIO_precharge, HIGH);
+      HVcntrlTimer = millis();
+    } else if ( cmdHV == 3 ) { // turn-off
+      digitalWrite(GPIO_discharge, LOW);
+      digitalWrite(GPIO_precharge, LOW);
+      digitalWrite(GPIO_contactor, LOW);
+      HVcntrlTimer = millis();
+    }
+}
+
+void
+Motor::HVcontrol( void )
+{
+  if ( HVstatus == 0 ) {            // OFF
+    // TODO
+  } else if ( HVstatus == 2 ) {     // ON
+    // TODO
+  } else if ( (HVstatus == 1 ) && (millis() > HVcntrlTimer + HVonHoldoff) ) {    
+    digitalWrite(GPIO_contactor, HIGH);
+    digitalWrite(GPIO_precharge, LOW);
+    HVstatus = 2;
+  } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + 1000) ) {
+    digitalWrite(GPIO_discharge, HIGH);
+    HVstatus = 0;
+  } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + HVoffHoldoff) ) {
+    digitalWrite(GPIO_discharge, LOW);
+    HVstatus = 3;
+  }
+
 }
 
 void
@@ -36,6 +83,7 @@ Motor::service( void )
     readThrottle();
     readCAN();
     writeThrottle();
+    HVcontrol();
 }
 
 int
