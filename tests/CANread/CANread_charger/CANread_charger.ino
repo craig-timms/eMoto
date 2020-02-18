@@ -4,7 +4,7 @@
 
 CAN_device_t CAN_cfg;               // CAN Config
 unsigned long previousMillis = 0;   // will store last time a CAN Message was send
-const int interval = 1000;          // interval at which send CAN Messages (milliseconds)
+const int interval = 500;          // interval at which send CAN Messages (milliseconds)
 const int rx_queue_size = 10;       // Receive Queue size
 int CANrx = 16;
 int CANtx = 17;
@@ -50,10 +50,11 @@ void loop() {
     else {
 //      Serial.println("New extended frame");
 //      Serial.println(rx_frame.MsgID);
-      printf("RTR from 0x%08X\r\n", rx_frame.MsgID);
+//      printf("RTR from 0x%08X\r\n", rx_frame.MsgID);
     }
 
 
+    printf("RTR from 0x%08X\r\n", rx_frame.MsgID);
 
     // Message 1
     if ( rx_frame.MsgID == 0x18EB2440 ) { // Charger status
@@ -208,21 +209,36 @@ void loop() {
     
   }
   // Send CAN Message
-//  if (currentMillis - previousMillis >= interval) {
-//    previousMillis = currentMillis;
-//    CAN_frame_t tx_frame;
-//    tx_frame.FIR.B.FF = CAN_frame_std;
-//    tx_frame.MsgID = 0x001;
-//    tx_frame.FIR.B.DLC = 8;
-//    tx_frame.data.u8[0] = 0x00;
-//    tx_frame.data.u8[1] = 0x01;
-//    tx_frame.data.u8[2] = 0x02;
-//    tx_frame.data.u8[3] = 0x03;
-//    tx_frame.data.u8[4] = 0x04;
-//    tx_frame.data.u8[5] = 0x05;
-//    tx_frame.data.u8[6] = 0x06;
-//    tx_frame.data.u8[7] = 0x07;
-//    ESP32Can.CANWriteFrame(&tx_frame);
+  int v_charge_max = 660; // max*10
+  uint8_t c_B2 = v_charge_max / 256;
+  uint8_t c_B1 = v_charge_max - (c_B2 * 256);
+
+  int i_charge_max = 10; // max*10
+  uint8_t c_B4 = (i_charge_max+32000) / 256;
+  uint8_t c_B3 = (i_charge_max+32000) - (c_B4 * 256);
+  
+  if (currentMillis - previousMillis >= interval) {
+    
+    previousMillis = currentMillis;
+    CAN_frame_t tx_frame;
+    tx_frame.FIR.B.FF = CAN_frame_ext;
+    tx_frame.MsgID = 0x18E54024;
+    tx_frame.FIR.B.DLC = 8;
+    tx_frame.data.u8[0] = 0x05; // 0x05 - stop  0x04 - start
+    tx_frame.data.u8[1] = c_B1; // voltage
+    tx_frame.data.u8[2] = c_B2; // 
+    tx_frame.data.u8[3] = c_B3; // current
+    tx_frame.data.u8[4] = c_B4; //
+    tx_frame.data.u8[5] = 0x04; // LED (G-)
+    tx_frame.data.u8[6] = 0x06; // 0xFF
+    tx_frame.data.u8[7] = 0x07; // 0xFF
+    ESP32Can.CANWriteFrame(&tx_frame);
+    
+    printf("  SENT: 0x%08X, DLC %d, Data ", rx_frame.MsgID,  rx_frame.FIR.B.DLC);
+    for (int i = 0; i < tx_frame.FIR.B.DLC; i++) {
+      printf("0x%02X ", tx_frame.data.u8[i]);
+    }
+    printf("\n");
 //    Serial.println("SENT");
-//  }
+  }
 }
