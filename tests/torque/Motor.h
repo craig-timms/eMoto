@@ -36,7 +36,6 @@ class Motor
 
     private:
 
-        void readCAN( void );
         int readThrottle( void );          // read ADC (0-1000)
         void writeThrottle( void );         // send to motor (0-1000)
         void HVcontrol( void );         // 
@@ -65,8 +64,8 @@ class Motor
 
         
         unsigned long HVcntrlTimer = 0;
-        unsigned long HVonHoldoff = 5000;
-        unsigned long HVoffHoldoff = 5000;
+        unsigned long HVonHoldoff = 10000;
+        unsigned long HVoffHoldoff = 10000;
 
 };
 

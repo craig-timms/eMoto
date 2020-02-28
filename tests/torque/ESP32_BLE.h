@@ -39,8 +39,15 @@
 #define VP_SLD 7
 
 #define VP_start_charge 22
+#define VP_charging 25
 #define VP_sld_Vmax 20
 #define VP_sld_Imax 21
+#define VP_val_V 23
+#define VP_val_I 24
+#define VP_CERR_VAC 26
+#define VP_CERR_HW 27
+#define VP_CERR_TEMP 28
+#define VP_CERR_COM 
 
 unsigned long BLEtime = 0;
 //unsigned long BLEtime_diff = 0;
@@ -61,24 +68,8 @@ int Button1 = 0;
 int Button2 = 0;
 int slider = 0;
 
-void BLE_writeGauges()
-{
-  Blynk.virtualWrite(VP_RPM, gRPM);
-  Blynk.virtualWrite(VP_I, gCurrent);
-  Blynk.virtualWrite(VP_V, gVoltage);
-  Blynk.virtualWrite(VP_T, gInvTemp);
-//  Serial.println("SENT");
-
-  // if (i >= 400) i = 0;
-  // if (n >= 6000) n = 0;
-  // if (v >= 67) v = 54;
-  // if (t >= 100) t = 0;
-
-  String lcdText = "Good";
-  if (gVoltage < 60) lcdText = "Bad ";
-  lcd.print(0,0, "Voltage: ");
-  lcd.print(0,1, lcdText);
-}
+#include "app_charge.h"
+#include "app_dash.h"
 
 void BLE_setup()
 {
@@ -97,20 +88,13 @@ void BLE_setup()
 //  delay(1000);
 }
 
-void BLE_update( int tRPM, int tCurrent, int tVoltage, int tItemp )
+void BLE_update()
 {
-  gRPM = tRPM;
-  gCurrent = tCurrent;
-  gVoltage = tVoltage;
-  gInvTemp = tItemp;
 
   Blynk.run();
 //  timer.run();
-  BLE_writeGauges();
-//  BLEtime = millis() - BLEtime;
-//  Serial.print("BLE time: ");
-//  Serial.print(BLEtime);
-//  Serial.println();
+
+  BLE_writeDash();
 }
 
 BLYNK_WRITE(VP_B1)
@@ -144,6 +128,29 @@ BLYNK_WRITE(VP_SLD)
   Serial.print("Slider changed to: ");
   Serial.print(slider);
   Serial.println();
+}
+
+BLYNK_WRITE(VP_sld_Vmax)
+{
+  charger.vMax = param.asInt(); // assigning incoming value from pin V1 to a variable
+}
+
+BLYNK_WRITE(VP_sld_Imax)
+{
+  charger.iMax = param.asInt(); // assigning incoming value from pin V1 to a variable
+}
+
+BLYNK_WRITE(VP_start_charge)
+{
+  int button = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if ( button == 0 ) {
+    Serial.println("Charging turned OFF");
+    CAN.sendCharger(false, charger.vMax, charger.iMax, 'Y');
+  } else if ( Button1 == 1 ) {
+    Serial.println("Charging turned ON");
+    CAN.sendCharger(true, charger.vMax, charger.iMax, 'R');
+  }
+  
 }
 
 

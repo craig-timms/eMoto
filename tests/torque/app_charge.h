@@ -1,0 +1,4 @@
+#ifndef APP_CHARGER_H
+#define APP_CHARGER_H
+
+#endif APP_CHARGER_H

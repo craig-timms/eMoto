@@ -1,7 +1,11 @@
 #include <Arduino.h>
 #include "Motor.h"
+#include "CANbus.h"
+#include "Charger.h"
 
 Motor motor;
+Charger charger;
+CANbus CAN;
 
 #include "ESP32_BLE.h"
 
