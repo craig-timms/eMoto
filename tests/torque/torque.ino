@@ -5,7 +5,7 @@
 
 Motor motor;
 Charger charger;
-CANbus CAN;
+CANbus CANb;
 
 #include "ESP32_BLE.h"
 
@@ -22,22 +22,27 @@ void setup()
 
   //module setup
   motor.setup();
+  CANb.setup();
 
-  delay(500);
+  delay(200);
   BLE_setup();
   delayStart = millis();
 
-  delay(500); // pause for stuff to stabilize
+  delay(200); // pause for stuff to stabilize
 }
 
 void loop() {
 
   motor.service();
+  CANb.read();
   
   // Bluetooth update every 200 ms
   if ( millis() > delayStart + delay_ms ) {    
-    BLE_update( motor.getRPM(), motor.getCurrent(), motor.getVoltage(), motor.getTempInv() );
+    BLE_update( );
     delayStart = millis();
+    if ( charger.cmdOn ) {
+      CANb.sendCharger(true, charger.vMax*10, charger.iMax*10, 'R');
+    }
   }
   
 }

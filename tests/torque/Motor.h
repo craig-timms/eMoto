@@ -9,7 +9,7 @@
 #define GPIO_throttleIN 39      // throttle
 #define GPIO_keyIN 36           // throttle
 #define GPIO_throttleOUT 23     // throttle
-#define GPIO_precharge 0       // HV control
+#define GPIO_precharge 2       // HV control
 #define GPIO_contactor 21       // HV control
 #define GPIO_discharge 4       // HV control
 CAN_device_t CAN_cfg;
@@ -39,11 +39,6 @@ class Motor
         int readThrottle( void );          // read ADC (0-1000)
         void writeThrottle( void );         // send to motor (0-1000)
         void HVcontrol( void );         // 
-
-        // CAN_device_t CAN_cfg;               // CAN Config
-        unsigned long previousMillis = 0;   // will store last time a CAN Message was send
-        const int interval = 1000;          // interval at which send CAN Messages (milliseconds)
-        const int rx_queue_size = 10;       // Receive Queue size
 
         int throttleIN = 0;
         int tINf[6] = {0, 0, 0, 0, 0, 0};

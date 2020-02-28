@@ -31,6 +31,7 @@ class CANbus
         int mRPM = 0;
         int mCurrent = 0;
         int mVoltage = 0;
+        int mThrottle = 0;
         char mERR[ 16 + 1 ] = {};
         int mTemp = 0;
         int mTempI = 0;
@@ -44,6 +45,11 @@ class CANbus
         bool cErrorVac = true;
         bool cErrorHW = true;
         bool cErrorCom = true;
+
+        // CAN_device_t CAN_cfg;               // CAN Config
+        unsigned long previousMillis = 0;   // will store last time a CAN Message was send
+        const int interval = 1000;          // interval at which send CAN Messages (milliseconds)
+        const int rx_queue_size = 10;       // Receive Queue size
 
 };
 

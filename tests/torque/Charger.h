@@ -15,6 +15,7 @@ public:
     bool eVac;
     bool eHW;
     bool eCom;
+    bool cmdOn = false;
 
     // void service();
     // void setHV( int );
