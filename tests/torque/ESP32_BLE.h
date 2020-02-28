@@ -34,9 +34,13 @@
 #define VP_V 2
 #define VP_T 3
 #define VP_LCD 4  // 16x2
-#define VP_B1 5
+#define VP_B1 5   // ignition
 #define VP_B2 6
 #define VP_SLD 7
+
+#define VP_start_charge 22
+#define VP_sld_Vmax 20
+#define VP_sld_Imax 21
 
 unsigned long BLEtime = 0;
 //unsigned long BLEtime_diff = 0;

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "Motor.h"
+
 Motor motor;
 
 #include "ESP32_BLE.h"
@@ -7,6 +8,8 @@ Motor motor;
 
 unsigned long delayStart = 0;
 unsigned long delay_ms = 200;
+bool print_mtr_CAN = false;
+bool print_chg_CAN = false;
 
 void setup() 
 {

@@ -127,25 +127,7 @@ Motor::readCAN( void )
   // Receive next CAN frame from queue
   if (xQueueReceive(CAN_cfg.rx_queue, &rx_frame, 3 * portTICK_PERIOD_MS) == pdTRUE) {
 
-//    if (rx_frame.FIR.B.FF == CAN_frame_std) {
-//      printf("New standard frame");
-//    }
-//    else {
-//      printf("New extended frame");
-//    }
-
-//    if (rx_frame.FIR.B.RTR == CAN_RTR) {
-//      printf(" RTR from 0x%08X, DLC %d\r\n", rx_frame.MsgID,  rx_frame.FIR.B.DLC);
-//    }
-//    else {
-//      printf(" from 0x%08X, DLC %d, Data ", rx_frame.MsgID,  rx_frame.FIR.B.DLC);
-//      for (int i = 0; i < rx_frame.FIR.B.DLC; i++) {
-//        printf("0x%02X ", rx_frame.data.u8[i]);
-//      }
-//      printf("\n");
-//    }
-
-    // Message 1
+    // Motor Message 1
     if ( rx_frame.MsgID == 0x0CF11E05 ) {
 
       // Bits
@@ -177,20 +159,9 @@ Motor::readCAN( void )
         i+=1;
       }
       ERR[ i ] = '\0';
-      
-//      printf(" RTR from 0x%08X ", rx_frame.MsgID);
-//      Serial.print("RPM: ");
-//      Serial.print(RPM);
-//      Serial.print("  I: ");
-//      Serial.print(currentMtr);
-//      Serial.print("  VDC: ");
-//      Serial.print(voltageDC);
-//      Serial.print("  ERRORS: ");
-//      Serial.print(ERR);
-//      Serial.println();
     }
 
-    // Message 2
+    // Motor Message 2
     if ( rx_frame.MsgID == 0x0CF11F05 ) {
 
       // Bits
@@ -211,10 +182,7 @@ Motor::readCAN( void )
 
       uint8_t bitsCount = 8;
 //      char statusInv[ bitsCount*2 + 1 ];
-      
-      
       uint8_t i = 0;
-//      uint8_t j = 0;
       while ( i < bitsCount ) {
         statusInv[ i ] = bitRead( bit4, i ) + '0';
         i+=1;
@@ -245,7 +213,7 @@ Motor::readCAN( void )
 
     }
 
-    if ( (rx_frame.MsgID == 0x0CF11E05) || (rx_frame.MsgID == 0x0CF11E05) ) {
+    if ( print_mtr_CAN && ((rx_frame.MsgID == 0x0CF11E05) || (rx_frame.MsgID == 0x0CF11E05)) ) {
       Serial.print("RPM: ");
       Serial.print(RPM);
       Serial.print("  I: ");
@@ -270,22 +238,4 @@ Motor::readCAN( void )
     }
     
   }
-  // Send CAN Message
-//   if (currentMillis - previousMillis >= interval) {
-//     previousMillis = currentMillis;
-//     CAN_frame_t tx_frame;
-//     tx_frame.FIR.B.FF = CAN_frame_std;
-//     tx_frame.MsgID = 0x001;
-//     tx_frame.FIR.B.DLC = 8;
-//     tx_frame.data.u8[0] = 0x00;
-//     tx_frame.data.u8[1] = 0x01;
-//     tx_frame.data.u8[2] = 0x02;
-//     tx_frame.data.u8[3] = 0x03;
-//     tx_frame.data.u8[4] = 0x04;
-//     tx_frame.data.u8[5] = 0x05;
-//     tx_frame.data.u8[6] = 0x06;
-//     tx_frame.data.u8[7] = 0x07;
-//     ESP32Can.CANWriteFrame(&tx_frame);
-//     Serial.println("SENT");
-//   }
 }

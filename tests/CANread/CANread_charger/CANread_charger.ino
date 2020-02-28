@@ -80,10 +80,6 @@ void loop() {
         printf("\n");
       }
 
-      // Speed, Current, Voltage
-//      RPM = ( (bit1*256) + bit0 );
-//      currentMtr = ( (bit3*256) + bit2 ) / 10;
-//      voltageDC = ( (bit5*256) + bit4 ) / 10;
 //
       uint8_t bitsCount = 8;
 //      char ERR[ bitsCount*2 + 1 ];
@@ -95,21 +91,10 @@ void loop() {
         ERR2[ i ] = bitRead( bit1, i ) + '0';
         i+=1;
       } 
-//      while ( (i < bitsCount*2) && (i >= bitsCount) ) {
-//        ERR[ i ] = bitRead( bit7, i - bitsCount ) + '0';
-//        i+=1;
-//      }
+
       ERR[ i ] = '\0';
       ERR2[ i ] = '\0';
-      
-//      printf(" RTR from 0x%08X ", rx_frame.MsgID);
-//      Serial.print("RPM: ");
-//      Serial.print(RPM);
-//      Serial.print("  I: ");
-//      Serial.print(currentMtr);
-//      Serial.print("  VDC: ");
-//      Serial.print(voltageDC);
-//      Serial.print("  ERRORS: ");
+
       Serial.println(ERR);
       Serial.println(ERR2);
       Serial.println(bit2, DEC);
@@ -140,72 +125,6 @@ void loop() {
         }
         printf("\n");
       }
-
-//      // Speed, Current, Voltage
-//      float temp = ( (float)bit0 * (100.0/255.0) );
-//      throttleRead = (int)temp;
-//      tempInv = bit1 - 40;
-//      tempMtr = bit2 - 30;
-//
-//      uint8_t bitsCount = 8;
-////      char statusInv[ bitsCount*2 + 1 ];
-//      
-//      
-//      uint8_t i = 0;
-////      uint8_t j = 0;
-//      while ( i < bitsCount ) {
-//        statusInv[ i ] = bitRead( bit4, i ) + '0';
-//        i+=1;
-//      } 
-//      while ( (i < bitsCount*2) && (i >= bitsCount) ) {
-//        statusInv[ i ] = bitRead( bit5, i - bitsCount ) + '0';
-//        i+=1;
-//      }
-//      statusInv[ i ] = '\0';
-//
-//      statusCmd = 'N';     
-//      if ( (statusInv[0] == '0') & (statusInv[1] == '0') ) {
-//        statusCmd = 'N';
-//      } else if ( (statusInv[0] == '1') & (statusInv[1] == '0') ) {
-//        statusCmd = 'F';
-//      } else if ( (statusInv[0] == '0') & (statusInv[1] == '1') ) {
-//        statusCmd = 'R';
-//      }
-//
-//      statusFb = 'N';     
-//      if ( (statusInv[2] == '0') & (statusInv[3] == '0') ) {
-//        statusFb = 'N';
-//      } else if ( (statusInv[2] == '1') & (statusInv[3] == '0') ) {
-//        statusFb = 'F';
-//      } else if ( (statusInv[2] == '0') & (statusInv[3] == '1') ) {
-//        statusFb = 'R';
-//      }
-
-    }
-
-//    if ( (rx_frame.MsgID == 0x0CF11E05) || (rx_frame.MsgID == 0x0CF11E05) ) {
-//      Serial.print("RPM: ");
-//      Serial.print(RPM);
-//      Serial.print("  I: ");
-//      Serial.print(currentMtr);
-//      Serial.print("  VDC: ");
-//      Serial.print(voltageDC);
-//      Serial.print("  ERRORS: ");
-//      Serial.print(ERR);
-//      Serial.print("  ThIN: ");
-//      Serial.print(throttleIN);
-//      Serial.print("  ThR: ");
-//      Serial.print(throttleRead);
-//      Serial.print("  Ti: ");
-//      Serial.print(tempInv);
-//      Serial.print("  Tm: ");
-//      Serial.print(tempMtr);
-//      Serial.print("  CMD: ");
-//      Serial.print(statusCmd);
-//      Serial.print("  FB: ");
-//      Serial.print(statusFb);
-//      Serial.println();
-//    }
     
   }
   // Send CAN Message
