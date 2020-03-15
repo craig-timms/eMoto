@@ -2,10 +2,12 @@
 #include "Motor.h"
 #include "CANbus.h"
 #include "Charger.h"
+#include "Lights.h"
 
 Motor motor;
 Charger charger;
 CANbus CANb;
+Lights lights;
 
 #include "ESP32_BLE.h"
 
@@ -18,11 +20,12 @@ bool print_chg_CAN = false;
 void setup() 
 {
   //debug serial ouput
-  Serial.begin( 115200 );
+  Serial.begin( 9600 );
 
   //module setup
   motor.setup();
   CANb.setup();
+  lights.setup();
 
   delay(200);
   BLE_setup();
@@ -35,6 +38,7 @@ void loop() {
 
   motor.service();
   CANb.read();
+  lights.service();
   
   // Bluetooth update every 200 ms
   if ( millis() > delayStart + delay_ms ) {    
