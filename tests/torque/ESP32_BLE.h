@@ -47,7 +47,7 @@
 #define VP_CERR_VAC 26
 #define VP_CERR_HW 27
 #define VP_CERR_TEMP 28
-#define VP_CERR_COM 
+#define VP_CERR_COM 29
 
 unsigned long BLEtime = 0;
 //unsigned long BLEtime_diff = 0;
@@ -71,6 +71,8 @@ int slider = 0;
 #include "app_charge.h"
 #include "app_dash.h"
 
+WidgetLED ledCharging(VP_charging);
+
 void BLE_setup()
 {
   // Debug console
@@ -85,8 +87,47 @@ void BLE_setup()
   Blynk.virtualWrite(VP_I, 400);
   Blynk.virtualWrite(VP_V, 68);
   Blynk.virtualWrite(VP_T, 100);
+
+  ledCharging.off();
 //  delay(1000);
 }
+
+void BLE_writeDash()
+{
+  Blynk.virtualWrite(VP_RPM, CANb.getmRPM() );
+  Blynk.virtualWrite(VP_I, CANb.getmCurrent() );
+  Blynk.virtualWrite(VP_V, CANb.getmVoltage() );
+  Blynk.virtualWrite(VP_T, CANb.getmTempI() );
+//  Serial.println("SENT");
+
+}
+
+void BLE_writeCharge()
+{
+  Blynk.virtualWrite(VP_val_V, CANb.getcVoltage() / 10 );
+  Blynk.virtualWrite(VP_val_I, CANb.getcCurrent() / 10 );
+  if ( CANb.getcCharging() ){
+    ledCharging.off();
+  } else {
+    ledCharging.on();
+  }
+
+  Blynk.virtualWrite(VP_CERR_VAC, CANb.getcErrorVac() );
+  Blynk.virtualWrite(VP_CERR_HW, CANb.getcErrorHW() );
+  Blynk.virtualWrite(VP_CERR_TEMP, CANb.getcErrorTemp() );
+  Blynk.virtualWrite(VP_CERR_COM, CANb.getcErrorCom() );
+
+  // if (i >= 400) i = 0;
+  // if (n >= 6000) n = 0;
+  // if (v >= 67) v = 54;
+  // if (t >= 100) t = 0;
+
+  String lcdText = "Good";
+  if (CANb.getcVoltage() < 60) lcdText = "Bad ";
+  lcd.print(0,0, "Voltage: ");
+  lcd.print(0,1, lcdText);
+}
+
 
 void BLE_update()
 {
@@ -95,6 +136,7 @@ void BLE_update()
 //  timer.run();
 
   BLE_writeDash();
+  BLE_writeCharge();
 }
 
 BLYNK_WRITE(VP_B1)
@@ -132,12 +174,12 @@ BLYNK_WRITE(VP_SLD)
 
 BLYNK_WRITE(VP_sld_Vmax)
 {
-  charger.vMax = param.asInt(); // assigning incoming value from pin V1 to a variable
+  charger.vMax = param.asInt()*10; // assigning incoming value from pin V1 to a variable
 }
 
 BLYNK_WRITE(VP_sld_Imax)
 {
-  charger.iMax = param.asInt(); // assigning incoming value from pin V1 to a variable
+  charger.iMax = param.asInt()*10; // assigning incoming value from pin V1 to a variable
 }
 
 BLYNK_WRITE(VP_start_charge)
@@ -145,10 +187,19 @@ BLYNK_WRITE(VP_start_charge)
   int button = param.asInt(); // assigning incoming value from pin V1 to a variable
   if ( button == 0 ) {
     Serial.println("Charging turned OFF");
-    CAN.sendCharger(false, charger.vMax, charger.iMax, 'Y');
-  } else if ( Button1 == 1 ) {
+    Serial.println(CANb.getcCharging());
+    charger.cmdOn = false;
+    CANb.sendCharger(false, charger.vMax, charger.iMax, 'Y');
+  } else if ( button == 1 ) {
     Serial.println("Charging turned ON");
-    CAN.sendCharger(true, charger.vMax, charger.iMax, 'R');
+    Serial.println(CANb.getcCharging());
+    charger.cmdOn = true;
+    CANb.sendCharger(true, charger.vMax, charger.iMax, 'R');
+    Serial.print("Vmax: ");
+    Serial.print(charger.vMax);
+    Serial.print("Imax: ");
+    Serial.print(charger.iMax);
+    Serial.println();
   }
   
 }

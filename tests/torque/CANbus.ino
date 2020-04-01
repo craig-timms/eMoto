@@ -22,19 +22,19 @@ void CANbus::restart(void)
 
 void CANbus::sendCharger(bool charge, int voltage, int current, char LED)
 {
-  unit8_t c_B0 = 0x05;
+  uint8_t c_B0 = 0x05;
   if (charge)
   {
     c_B0 = 0x04;
   }
 
-  uint8_t c_B2 = v_charge_max / 256;
-  uint8_t c_B1 = v_charge_max - (c_B2 * 256);
+  uint8_t c_B2 = charger.vMax / 256;
+  uint8_t c_B1 = charger.vMax - (c_B2 * 256);
 
-  uint8_t c_B4 = (i_charge_max + 32000) / 256;
-  uint8_t c_B3 = (i_charge_max + 32000) - (c_B4 * 256);
+  uint8_t c_B4 = (charger.iMax + 32000) / 256;
+  uint8_t c_B3 = (charger.iMax + 32000) - (c_B4 * 256);
 
-  unit8_t c_B5 = 0x01;
+  uint8_t c_B5 = 0x01;
   if (LED == 'r')
   {
     c_B5 = 0x00;
@@ -65,6 +65,7 @@ void CANbus::sendCharger(bool charge, int voltage, int current, char LED)
   tx_frame.data.u8[6] = 0x06; // 0xFF
   tx_frame.data.u8[7] = 0x07; // 0xFF
   ESP32Can.CANWriteFrame(&tx_frame);
+  Serial.println("Charger CAN sent");
 }
 
 void CANbus::read(void)
@@ -131,10 +132,11 @@ void CANbus::read(void)
 
       // Speed, Current, Voltage
       float temp = ((float)bit0 * (100.0 / 255.0));
-      throttleRead = (int)temp;
-      tempInv = bit1 - 40;
-      tempMtr = bit2 - 30;
+      mThrottle = (int)temp;
+      mTempI = bit1 - 40;
+      mTemp = bit2 - 30;
 
+      uint8_t statusInv[16+1];
       uint8_t bitsCount = 8;
       //      char statusInv[ bitsCount*2 + 1 ];
       uint8_t i = 0;
@@ -150,32 +152,32 @@ void CANbus::read(void)
       }
       statusInv[i] = '\0';
 
-      statusCmd = 'N';
+      mGearCmd = 'N';
       if ((statusInv[0] == '0') & (statusInv[1] == '0'))
       {
-        statusCmd = 'N';
+        mGearCmd = 'N';
       }
       else if ((statusInv[0] == '1') & (statusInv[1] == '0'))
       {
-        statusCmd = 'F';
+        mGearCmd = 'F';
       }
       else if ((statusInv[0] == '0') & (statusInv[1] == '1'))
       {
-        statusCmd = 'R';
+        mGearCmd = 'R';
       }
 
-      statusFb = 'N';
+      mGearFb = 'N';
       if ((statusInv[2] == '0') & (statusInv[3] == '0'))
       {
-        statusFb = 'N';
+        mGearFb = 'N';
       }
       else if ((statusInv[2] == '1') & (statusInv[3] == '0'))
       {
-        statusFb = 'F';
+        mGearFb = 'F';
       }
       else if ((statusInv[2] == '0') & (statusInv[3] == '1'))
       {
-        statusFb = 'R';
+        mGearFb = 'R';
       }
     }
 
@@ -194,11 +196,11 @@ void CANbus::read(void)
       uint8_t bit7 = rx_frame.data.u8[7];
 
       cVoltage = (bit3 * 256) + bit2;
-      cCurrent = ((bit5 * 256) = bit4) - 32000;
+      cCurrent = ((bit5 * 256) + bit4) - 3200;
 
       //
-      int ERR[8 + 1] = {};
-      int ERR2[8 + 1] = {};
+      char ERR[8 + 1] = {};
+      char ERR2[8 + 1] = {};
 
       uint8_t bitsCount = 8; //      char ERR[ bitsCount*2 + 1 ];
       uint8_t i = 0;
@@ -213,63 +215,71 @@ void CANbus::read(void)
       ERR2[i] = '\0';
 
       cCharging = false;
-      if ((ERR2[6] == '0') & (ERR2[7] == '1'))
+      if ((ERR2[0] == '1') & (ERR2[1] == '0'))
       {
         cCharging = true;
       }
 
       cErrorTemp = true;
-      if ((ERR[0] == '0') & (ERR[1] == '1'))
+      if ((ERR[6] == '1') & (ERR[7] == '0'))
       {
         cErrorTemp = false;
       }
 
       cErrorVac = true;
-      if ((ERR[2] == '0') & (ERR[3] == '1'))
+      if ((ERR[4] == '1') & (ERR[5] == '0'))
       {
         cErrorVac = false;
       }
 
       cErrorHW = true;
-      if ((ERR[4] == '0') & (ERR[5] == '1'))
+      if ((ERR[2] == '1') & (ERR[3] == '0'))
       {
         cErrorHW = false;
       }
 
       cErrorCom = true;
-      if ((ERR[6] == '0') & (ERR[7] == '1'))
+      if ((ERR[0] == '1') & (ERR[1] == '0'))
       {
         cErrorCom = false;
       }
 
-      // Serial.println(cERR);
+       Serial.print(ERR2[0]);
+       Serial.print(ERR2[1]);
+       Serial.print(ERR2[2]);
+       Serial.print(ERR2[3]);
+       Serial.print(ERR2[4]);
+       Serial.print(ERR2[5]);
+       Serial.print(ERR2[6]);
+       Serial.print(ERR2[7]);
+       Serial.println();
       // Serial.println(bit2, DEC);
       // Serial.println(bit3, DEC);
     }
 
     if (print_mtr_CAN && ((rx_frame.MsgID == 0x0CF11E05) || (rx_frame.MsgID == 0x0CF11E05)))
     {
-      Serial.print("RPM: ");
-      Serial.print(mRPM);
-      Serial.print("  I: ");
-      Serial.print(mCurrent);
-      Serial.print("  VDC: ");
-      Serial.print(mVoltage);
-      Serial.print("  ERRORS: ");
-      Serial.print(mERR);
-      Serial.print("  ThIN: ");
-      Serial.print(throttleIN);
-      Serial.print("  ThR: ");
-      Serial.print(throttleRead);
-      Serial.print("  Ti: ");
-      Serial.print(tempInv);
-      Serial.print("  Tm: ");
-      Serial.print(tempMtr);
-      Serial.print("  CMD: ");
-      Serial.print(statusCmd);
-      Serial.print("  FB: ");
-      Serial.print(statusFb);
-      Serial.println();
+//      Serial.print("RPM: ");
+//      Serial.print(mRPM);
+//      Serial.print("  I: ");
+//      Serial.print(mCurrent);
+//      Serial.print("  VDC: ");
+//      Serial.print(mVoltage);
+//      Serial.print("  ERRORS: ");
+//      Serial.print(mERR);
+//      Serial.print("  ThIN: ");
+//      Serial.print(throttleIN);
+//      Serial.print("  ThR: ");
+//      Serial.print(throttleRead);
+//      Serial.print("  Ti: ");
+//      Serial.print(tempInv);
+//      Serial.print("  Tm: ");
+//      Serial.print(tempMtr);
+//      Serial.print("  CMD: ");
+//      Serial.print(mGearCmd);
+//      Serial.print("  FB: ");
+//      Serial.print(mGearFb);
+//      Serial.println();
     }
   }
 }
