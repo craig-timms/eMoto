@@ -29,6 +29,7 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 
+// Motor
 #define VP_RPM 0
 #define VP_I 1
 #define VP_V 2
@@ -38,6 +39,7 @@
 #define VP_B2 6
 #define VP_SLD 7
 
+// Charger
 #define VP_start_charge 22
 #define VP_charging 25
 #define VP_sld_Vmax 20
@@ -48,6 +50,13 @@
 #define VP_CERR_HW 27
 #define VP_CERR_TEMP 28
 #define VP_CERR_COM 29
+
+// Lights
+#define VP_angelRGB 30
+#define VP_angel 31
+#define VP_headlight 32
+#define VP_brake 33
+#define VP_turn 34
 
 unsigned long BLEtime = 0;
 //unsigned long BLEtime_diff = 0;
@@ -204,5 +213,69 @@ BLYNK_WRITE(VP_start_charge)
   
 }
 
+// Lights
+
+BLYNK_WRITE(VP_angel)
+{
+  int bin = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if ( bin == 0 ) {
+    lights.setAngel( false );
+  } else if ( bin == 1 ) {
+    lights.setAngel( true );
+  }
+}
+
+BLYNK_WRITE(VP_angelRGB)
+{
+  int rIn = param[0].asInt();
+  int gIn = param[1].asInt();
+  int bIn = param[2].asInt();
+  lights.setAngelRGB(rIn, gIn, bIn);
+}
+
+BLYNK_WRITE(VP_brake)
+{
+  int bin = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if ( bin == 0 ) {
+    lights.setBrake( false );
+  } else if ( bin == 1 ) {
+    lights.setBrake( true );
+  }
+}
+
+BLYNK_WRITE(VP_turn)
+{
+  int bin = 0;
+  switch (param.asInt())
+  {
+    case 1: {
+        bin = 1;
+        break;
+      }
+    case 2: {
+        bin = 0;
+         break;
+      }
+    case 3: {
+        bin = 2;
+        break;
+      }
+  } 
+  Serial.print("Sent to setTurn: ");
+  Serial.print(bin);
+  Serial.println();
+  lights.setTurn( bin );
+
+}
+
+BLYNK_WRITE(VP_headlight)
+{
+  int bin = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if ( bin == 0 ) {
+    // lights.setAngel( false );
+  } else if ( bin == 1 ) {
+    // lights.setAngel( true );
+  }
+}
 
 #endif ESP32_BLE_H
