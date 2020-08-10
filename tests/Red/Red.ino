@@ -38,8 +38,6 @@
 #define DATA_PIN_L 1  // left
 #define DATA_PIN_R 3  // right
 
-
-
 boolean blinker = false;
 unsigned long blinkerTimer = 0;
 unsigned long blinkerPeriod = 400;

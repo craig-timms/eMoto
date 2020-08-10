@@ -1,0 +1,56 @@
+{
+  "System": {
+    "state": {},
+    "speed": {},
+    "acceleration": {},
+    "roll": {},
+    "pitch": {},
+    "yaw": {},
+    "trip1": {},
+    "trip2": {},
+    "longitude": {},
+    "latitude": {},
+    "wifi": {},
+    "LTE": {}
+  },
+  "battery": {
+    "voltage": {},
+    "current": {},
+    "contactor": {},
+    "discharge": {},
+    "precharge": {}
+  },
+  "MCU": {
+    "gear": {},
+    "throttle": {},
+    "voltage": {},
+    "current": {},
+    "RPM": {},
+    "temp": {},
+    "tempM1": {},
+    "tempM2": {},
+    "errors": {}
+  },
+  "charger": {
+    "charging": {},
+    "vmax": {},
+    "imax": {},
+    "voltage": {},
+    "current": {},
+    "errorVac": {},
+    "errorHW": {},
+    "errorTemp": {},
+    "errorCom": {}
+  },
+  "lights": {
+    "LB": {},
+    "HB": {},
+    "brake": {},
+    "left": {},
+    "right": {},
+    "angel": {},
+    "styleTurn": {},
+    "styleAngel": {},
+    "brightness": {}
+  }
+}
