@@ -51,6 +51,12 @@ struct Vehicle
         int turn = 0;
         int beams = 0;
         int angel = 0;
+        bool S1 = false;
+        bool S2 = false;
+        bool AUX1 = false;
+        bool AUX2 = false;
+        bool AUX3 = false;
+        bool AUX4 = false;
     };
 
     Battery battery;

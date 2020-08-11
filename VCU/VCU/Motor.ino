@@ -67,18 +67,7 @@ Motor::service( void )
     // TODO
     // if (error) writeThrottle(0);
 
-    writeThrottle();
-}
-
-int
-Motor::readThrottle( void )
-{
-  throttleIN = (analogRead(GPIO_throttleIN)-630) * 1000 / (4095-630);
-  if (throttleIN<0) { throttleIN = 0; }
-  throttleOUT = (throttleIN*4095)/1000;
-//  Serial.println("Throttle GOT");
-
-  return throttleOUT;
+    setThrottle( vehicle.controls.throttle );
 }
 
 void

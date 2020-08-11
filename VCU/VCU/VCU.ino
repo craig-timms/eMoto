@@ -1,31 +1,52 @@
 #include <Arduino.h>
 #include "Vehicle.h"
+#include "pindef.h"
 #include "Monitor.h"
-#include "CANbus.h"
-#include "Signals.h"
-#include "Motor.h"
+//#include "CANbus.h"
+//#include "Signals.h"
+//#include "Motor.h"
+#include "Dash.h"
+
+unsigned long StartTime = millis();
+unsigned long CurrentTime = millis();
+unsigned long ElapsedTime = CurrentTime - StartTime;
 
 Vehicle vehicle;
 Monitor monitor;
 
-CANbus CANb;
-Signals signals;
-Motor motor;
-void setup() {
+//CANbus CANb;
+//Signals signals;
+Dash dash;
+//Motor motor;
+
+void setup()
+{
+  Serial.begin(9600);
   // put your setup code here, to run once:
   vehicle.state = 0;
 
-  // 
-  CANb.setup();
-  signals.setup();
-  motor.setup();
-
+  //
+  //  CANb.setup();
+  //  signals.setup();
+  //  motor.setup();
   monitor.setup();
-
-
+  dash.setup();
 }
 
-void loop() {
+void loop()
+{
+  StartTime = millis();
   // put your main code here, to run repeatedly:
+  //  CANb.service();
+  monitor.service();
+  //  signals.service();
+  dash.service();
 
+  Serial.print("Throttle: ");
+  Serial.print(vehicle.controls.throttle);
+
+  CurrentTime = millis();
+  ElapsedTime = CurrentTime - StartTime;
+  Serial.print(" - ");
+  Serial.println(ElapsedTime);
 }

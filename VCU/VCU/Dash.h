@@ -2,6 +2,9 @@
 #define DASH_H
 
 #include "FastLED.h"
+#include "MCP23016.h"
+
+MCP23016 gpioExpander;
 
 class Dash
 {
@@ -15,8 +18,13 @@ class Dash
         void shareData( void );
         void screenSetup( void );
         void setDash( void );
-        void screen1( void );
+        
+        void getDash( void );
+
+        void screen1( int );
         void screen2( void );
+        void drawBitmap1( void );
+        void drawBitmap2( void );
 
         bool key = false;
         int throttle = 0;
@@ -26,6 +34,9 @@ class Dash
         bool horn = false;
         int motorTemp1 = 0;
         int motorTemp2 = 0;
+        int expander = 0;
+
+        CRGB leds_dash[NUM_LEDS_DASH];
 
 };
 

@@ -14,7 +14,7 @@ class Motor
         void setThrottle( int );
         void setBrake( int );
 
-        int getThrottle( void )         { return throttleOUT; }      // returns (0-1000)
+//        int getThrottle( void )         { return throttleOUT; }      // returns (0-1000)
         int getRPM( void )              { return RPM; }
         int getCurrent( void )          { return currentMtr; }
         int getVoltage( void )          { return voltageDC; }
