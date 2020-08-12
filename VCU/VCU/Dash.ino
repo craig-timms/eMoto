@@ -68,7 +68,7 @@ void Dash::screenSetup(void)
 
   drawBitmap2();
   screen1(0);
-  delay(100);
+  delay(2000);
 
   // TODO - setup for screen
   // TODO - setup for GPIO EXTENSION
@@ -83,7 +83,7 @@ void Dash::service(void)
 {
   setLEDS();
   screen1(1);
-//  screen2();
+  screen2(1);
 
   getDash();
 }
@@ -100,84 +100,112 @@ void Dash::setLEDS(void)
 void Dash::getDash(void)
 {
   expander = gpioExpander.readArr();
-  for (int i = 15; i >= 0; i--)
+  // for (int i = 15; i >= 0; i--)
+  // {
+  //   Serial.print(bitRead(expander, i));
+  // }
+  // Serial.print(" - ");
+
+  // Gear
+  if (bitRead(expander, 0) == 1)
   {
-    Serial.print(bitRead(expander, i));
+    vehicle.controls.gear = 4; // L
   }
-  Serial.print(" - ");
-
-    // Gear
-  if ( bitRead(expander, 0) == 1 ) {
-      vehicle.controls.gear = 4;    // L
-  } else if ( bitRead(expander, 15) == 1 ) {
-        vehicle.controls.gear = 3;  // D
-  } else if ( bitRead(expander, 14) == 1 ) {
-        vehicle.controls.gear = 2;  // N
-  } else if ( bitRead(expander, 13) == 1 ) {
-        vehicle.controls.gear = 1;  // R
-  } else if ( bitRead(expander, 12) == 1 ) {
-        vehicle.controls.gear = 0;  // P  
+  else if (bitRead(expander, 15) == 1)
+  {
+    vehicle.controls.gear = 3; // D
+  }
+  else if (bitRead(expander, 14) == 1)
+  {
+    vehicle.controls.gear = 2; // N
+  }
+  else if (bitRead(expander, 13) == 1)
+  {
+    vehicle.controls.gear = 1; // R
+  }
+  else if (bitRead(expander, 12) == 1)
+  {
+    vehicle.controls.gear = 0; // P
   }
 
-    // Intensity
-  if ( bitRead(expander, 3) == 1 ) {
-      vehicle.controls.intensity = 1;  
-  } else if ( bitRead(expander, 4) == 1 ) {
-        vehicle.controls.intensity = 2;
-  } else if ( bitRead(expander, 5) == 1 ) {
-        vehicle.controls.intensity = 3;
-  } else if ( bitRead(expander, 6) == 1 ) {
-        vehicle.controls.intensity = 4;
-  } else if ( bitRead(expander, 7) == 1 ) {
-        vehicle.controls.intensity = 5;  
+  // Intensity
+  if (bitRead(expander, 3) == 1)
+  {
+    vehicle.controls.intensity = 1;
+  }
+  else if (bitRead(expander, 4) == 1)
+  {
+    vehicle.controls.intensity = 2;
+  }
+  else if (bitRead(expander, 5) == 1)
+  {
+    vehicle.controls.intensity = 3;
+  }
+  else if (bitRead(expander, 6) == 1)
+  {
+    vehicle.controls.intensity = 4;
+  }
+  else if (bitRead(expander, 7) == 1)
+  {
+    vehicle.controls.intensity = 5;
   }
 
   // Switches
-  if ( bitRead(expander, 2) == 1 ) { 
-        vehicle.controls.S1 = true;  
-  } else
+  if (bitRead(expander, 2) == 1)
   {
-     vehicle.controls.S1 = false;  
+    vehicle.controls.S1 = true;
   }
-  
-  if ( bitRead(expander, 1) == 1 ) { 
-        vehicle.controls.S2 = true;  
-  } else
+  else
   {
-     vehicle.controls.S2 = false;  
+    vehicle.controls.S1 = false;
   }
-  
-  if ( bitRead(expander, 8) == 1 ) { 
-        vehicle.controls.AUX1 = true;  
-  } else
-  {
-     vehicle.controls.AUX1 = false;  
-  }
-  
-  if ( bitRead(expander, 9) == 1 ) { 
-        vehicle.controls.AUX2 = true;  
-  } else
-  {
-     vehicle.controls.AUX2 = false;  
-  }
-  
-  if ( bitRead(expander, 10) == 1 ) { 
-        vehicle.controls.AUX3 = true;  
-  } else
-  {
-     vehicle.controls.AUX3 = false;  
-  }
-  
-  if ( bitRead(expander, 11) == 1 ) { 
-        vehicle.controls.AUX1 = true;  
-  } else
-  {
-     vehicle.controls.AUX1 = false;  
-  }
-  
 
+  if (bitRead(expander, 1) == 1)
+  {
+    vehicle.controls.S2 = true;
+  }
+  else
+  {
+    vehicle.controls.S2 = false;
+  }
 
-    /*
+  if (bitRead(expander, 8) == 1)
+  {
+    vehicle.controls.AUX1 = true;
+  }
+  else
+  {
+    vehicle.controls.AUX1 = false;
+  }
+
+  if (bitRead(expander, 9) == 1)
+  {
+    vehicle.controls.AUX2 = true;
+  }
+  else
+  {
+    vehicle.controls.AUX2 = false;
+  }
+
+  if (bitRead(expander, 10) == 1)
+  {
+    vehicle.controls.AUX3 = true;
+  }
+  else
+  {
+    vehicle.controls.AUX3 = false;
+  }
+
+  if (bitRead(expander, 11) == 1)
+  {
+    vehicle.controls.AUX1 = true;
+  }
+  else
+  {
+    vehicle.controls.AUX1 = false;
+  }
+
+  /*
         15 - D
         14 - N
         13 - R
@@ -194,8 +222,7 @@ void Dash::getDash(void)
         2  - S1
         1  - S2
         0  - L
-    */
-
+  */
 }
 
 void Dash::shareData(void)
@@ -260,17 +287,99 @@ void Dash::screen1(int state)
   }
 }
 
-void Dash::screen2(void)
+void Dash::screen2( int state )
 {
-  // if (!display2.begin(SSD1306_SWITCHCAPVCC, 0x3C))
-  // { // Address 0x3D for 128x64
-  //     Serial.println(F("Second SSD1306 allocation failed"));
-  //     for (;;)
-  //         ; // Don't proceed, loop forever
-  // }
-
   display2.clearDisplay();
-  display2.display();
+  display2.setCursor(0, 0);
+  display2.setTextSize(2);
+  display2.setTextColor(WHITE); // Draw 'inverse' text
+
+  if (state == 1)
+  {
+    // Battery Voltage 1
+    display2.setTextSize(1);
+    display2.print(F("Turn:   "));
+    display2.setTextSize(2);
+    if (vehicle.controls.turn == 1)
+    {
+      display2.println(F("L"));
+    }
+    else if ( vehicle.controls.turn == 2 )
+    {
+      display2.println(F("R"));
+    }
+    else
+    {
+      display2.println(  );
+    }
+
+    // Battery Voltage 2
+    display2.setTextSize(1);
+    display2.print(F("Lights: "));
+    display2.setTextSize(2);
+    if ( vehicle.controls.headlights )
+    {
+      display2.println(F("H"));
+    }
+    else
+    {
+      display2.println(F("L"));
+    }
+    display2.setTextSize(1);
+    display2.print(F("Horn:   "));
+    display2.setTextSize(2);
+    if ( vehicle.controls.horn )
+    {
+      display2.println(F("HONK"));
+    } else
+    {
+      display2.println();
+    }
+    // Key
+    display2.setTextSize(1);
+    display2.print(F("Key:    "));
+    display2.setTextSize(2);
+    if ( vehicle.controls.key )
+    {
+      display2.println(F("ON"));
+    } else
+    {
+      display2.println(F("OFF"));
+    }
+    // display.print(vR[1], 2);
+    // display.setTextSize(1);
+    // display.print(F("V "));
+    // display.setTextSize(2);
+    // display.print(F("\n"));       // new line
+    // // Battery Voltage 3
+    // display2.setTextSize(1);
+    // display2.print(F("Level:    "));
+    // display2.setTextSize(2);
+    // display2.println(vehicle.controls.intensity);
+
+    // display.print(vR[2], 2);
+    // display.setTextSize(1);
+    // display.print(F("V "));
+    // display.setTextSize(2);
+    // // Battery Voltage 4
+    // display.print(vR[3], 2);
+    // display.setTextSize(1);
+    // display.print(F("V "));
+    // display.setTextSize(2);
+    // display.print(F("\n"));       // new line
+    // // Battery Voltage 5
+    // display.print(vR[4], 2);
+    // display.setTextSize(1);
+    // display.print(F("V "));
+    // display.setTextSize(2);
+    // display.print(F("\n"));       // new line
+    // display.display();
+    display2.display();
+  }
+  else if (state == 0)
+  {
+    drawBitmap2();
+  }
 }
 
 void Dash::drawBitmap1(void)

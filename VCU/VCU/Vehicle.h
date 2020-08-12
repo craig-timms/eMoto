@@ -43,13 +43,15 @@ struct Vehicle
     struct Controls
     {
         // enum gear { P, R, N, D, L};
+        bool key = false;
         int gear = 0;
         int intensity = 0;
         int throttle = 0;
         int regen = 0;
         bool brake = false;
         int turn = 0;
-        int beams = 0;
+        bool horn = false;
+        bool headlights = false;
         int angel = 0;
         bool S1 = false;
         bool S2 = false;

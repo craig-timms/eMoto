@@ -22,7 +22,7 @@ class Dash
         void getDash( void );
 
         void screen1( int );
-        void screen2( void );
+        void screen2( int );
         void drawBitmap1( void );
         void drawBitmap2( void );
 

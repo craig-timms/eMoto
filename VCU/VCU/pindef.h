@@ -28,14 +28,14 @@
 // Monitor pins
 #define GPIO_WAKEUP_OUT     5
 #define GPIO_KEY_IN         12
-#define ADC_THROTTLE_IN     33
-#define ADC_HL_IN           32
-#define GPIO_R_IN           4
-#define GPIO_L_IN           2
-#define GPIO_HORN_IN        13
+#define ADC_THROTTLE_IN     33  
+#define GPIO_HL_IN          32  //
+#define GPIO_R_IN           4   //
+#define GPIO_L_IN           2   //
+#define GPIO_HORN_IN        13  //
 #define ADC_MOTOR_TEMP_1    39
 #define ADC_MOTOR_TEMP_2    36
-#define ADC_REGEN          35
+#define ADC_REGEN           35
 
 // Com pins
 #define GPIO_SCL        22  // I2C

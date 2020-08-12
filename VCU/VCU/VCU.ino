@@ -42,8 +42,15 @@ void loop()
   //  signals.service();
   dash.service();
 
-  Serial.print("Throttle: ");
-  Serial.print(vehicle.controls.throttle);
+//  Serial.print("Throttle: ");
+//  Serial.print(vehicle.controls.throttle);
+  
+
+  Serial.print("Beams: ");
+  if (vehicle.controls.headlights) {
+    Serial.print("ON");
+  }
+  Serial.print( " - " );
 
   CurrentTime = millis();
   ElapsedTime = CurrentTime - StartTime;
