@@ -1,7 +1,6 @@
 #include "Monitor.h"
 // #include "Vehicle.h"
 
-#define ADC_THROTTLE_IN     33
 #define POT_OFFSET          850
 #define throttle_ave_n      8
 int potValue = 0;
@@ -9,6 +8,14 @@ int throttle_ave = 0;
 int throttle_i = 0;
 int throttle_sum = 0;
 int throttle_filter[throttle_ave_n] = {0};
+
+#define POT_OFFSET_R          250
+#define regen_ave_n      8
+int potValueR = 0;
+int regen_ave = 0;
+int regen_i = 0;
+int regen_sum = 0;
+int regen_filter[regen_ave_n] = {0};
 
 void Monitor::setup(void)
 {
@@ -51,7 +58,19 @@ void Monitor::readControls(void)
     if (throttle_ave > 998) { throttle_ave = 1000; } 
     throttle = throttle_ave;
 
-    regen = analogRead(ADC_REGEN);
+    // regen
+    regen_i += 1;
+    if (regen_i >= (regen_ave_n))
+    {
+        regen_i = 0;
+    }
+    potValueR = (analogRead(ADC_REGEN) - POT_OFFSET_R) * 1000;
+    regen_sum = regen_sum - regen_filter[regen_i] + potValueR;
+    regen_ave = regen_sum / regen_ave_n / 4095;
+    regen_filter[regen_i] = potValueR;
+    if (regen_ave < 0) { regen_ave = 0; } 
+    if (throttle_ave > 998) { throttle_ave = 1000; } 
+    regen = regen_ave;
 
     headlights = false;
     headlights = digitalRead(GPIO_HL_IN);
@@ -90,6 +109,7 @@ void Monitor::readControls(void)
 void Monitor::shareData(void)
 {
     vehicle.controls.throttle = throttle;
+    vehicle.controls.regen = regen;
     vehicle.controls.turn = turn;
     vehicle.controls.horn = horn;
     vehicle.controls.headlights = headlights;

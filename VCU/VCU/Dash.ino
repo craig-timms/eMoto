@@ -244,14 +244,19 @@ void Dash::screen1(int state)
   {
     // Battery Voltage 1
     display.setTextSize(1);
+    display.print(F("Gear:     "));
+    display.setTextSize(2);
+    display.println(vehicle.controls.gear);
+    //
+    display.setTextSize(1);
     display.print(F("Throttle: "));
     display.setTextSize(2);
     display.println(vehicle.controls.throttle);
     // Battery Voltage 2
     display.setTextSize(1);
-    display.print(F("Gear:     "));
+    display.print(F("Regen:    "));
     display.setTextSize(2);
-    display.println(vehicle.controls.gear);
+    display.println(vehicle.controls.regen);
     // display.print(vR[1], 2);
     // display.setTextSize(1);
     // display.print(F("V "));

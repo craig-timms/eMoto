@@ -15,15 +15,14 @@
 #define GPIO_EXTRA_12V  18
 
 #define NUM_LEDS_B      8
-#define NUM_LEDS_turn   8
-#define NUM_LEDS_turn   8
+#define NUM_LEDS_TURN   8
 #define NUM_LEDS_ANGEL  8
 
 // Dash pins
 #define GPIO_LED_DASH   14
 // #define GPIO_POT_DASH   35
 
-#define NUM_LEDS_DASH      2
+#define NUM_LEDS_DASH      7
 
 // Monitor pins
 #define GPIO_WAKEUP_OUT     5
