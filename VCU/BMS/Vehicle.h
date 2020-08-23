@@ -21,15 +21,9 @@ struct Vehicle
     
     struct Charger
     {
-        bool on = false;
-        int v = 15;
-        int i = 15;
         int vMax = 120;
         int iMax = 5;
-        bool error_vac = false;
-        bool error_HW = false;
-        bool error_Temp = false;
-        bool error_Com = false;
+        int errors = 0;
     };
     
     struct MCU

@@ -42,4 +42,44 @@
 #define GPIO_CAN_TX     17  // UART
 #define GPIO_CAN_RX     16  // UART
 
+// CAN IDs
+#define CANID_CHARGER_GET   0x18EB2440
+#define CANID_CHARGER_SET   0x18E54024
+#define CANID_MCU_1         0x0CF11E05
+#define CANID_MCU_2         0x0CF11F05
+#define CANID_CONTROLS      0x18EB243C
+#define CANID_STATE         0x18EB244B
+#define CANID_BATTERY       0x18EB2432
 
+
+////////////////////////////////
+//////////  App   //////////////
+////////////////////////////////
+// Motor
+#define VP_RPM  0
+#define VP_I    1
+#define VP_V    2
+#define VP_T    3
+#define VP_LCD  4 // 16x2
+#define VP_B1   5  // ignition
+#define VP_B2   6
+#define VP_SLD  7
+
+// Charger
+#define VP_start_charge 22
+#define VP_charging     25
+#define VP_sld_Vmax     20
+#define VP_sld_Imax     21
+#define VP_val_V        23
+#define VP_val_I        24
+#define VP_CERR_VAC     26
+#define VP_CERR_HW      27
+#define VP_CERR_TEMP    28
+#define VP_CERR_COM     29
+
+// Lights
+#define VP_angelRGB     30
+#define VP_angel        31
+#define VP_headlight    32
+#define VP_brake        33
+#define VP_turn         34
