@@ -2,17 +2,18 @@ void appSetup()
 {
   // Debug console
   Serial.println("Waiting for connections...");
-  Blynk.setDeviceName("eMoto");
-  Blynk.begin(auth);
+  //  Blynk.setDeviceName("eMoto");
+  //  Blynk.begin(authBT);
+  Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8442);
   //    timer.setInterval(1 * 1000, reconnectBlynk);  // check every minute if still connected to server
-//  timer.setInterval(100L, appUpdate);
+  timer.setInterval(100L, appUpdate);
   lcd.clear();
-  Blynk.virtualWrite(VP_B1, LOW);
-  Blynk.virtualWrite(VP_B2, LOW);
+  Blynk.virtualWrite(VP_B1,  LOW);
+  Blynk.virtualWrite(VP_B2,  LOW);
   Blynk.virtualWrite(VP_RPM, 6000);
-  Blynk.virtualWrite(VP_I, 400);
-  Blynk.virtualWrite(VP_V, 68);
-  Blynk.virtualWrite(VP_T, 100);
+  Blynk.virtualWrite(VP_I,   400);
+  Blynk.virtualWrite(VP_V,   68);
+  Blynk.virtualWrite(VP_T,   100);
 
   ledCharging.off();
   //  delay(1000);
@@ -21,15 +22,23 @@ void appSetup()
 void appService()
 {
   // Debug console
-  if ((millis() - tStart) > tPeriod)
-  {
-    appUpdate();
-    tStart = millis();
-    // Serial.println("App updated");
-    Serial.println(Blynk.connected());
-  }
+//  if ((millis() - tStart) > tPeriod)
+//  {
+//    appUpdate();
+//    tStart = millis();
+//    // Serial.println("App updated");
+//    Serial.println(Blynk.connected());
+//  }
+
+//    if (Blynk.connected())
+//    {
+//      Blynk.run();
+//      timer.run();
+//    }
+    
   Blynk.run();
-//  timer.run();
+  timer.run();
+
 }
 
 void appUpdate()
@@ -47,7 +56,7 @@ void appWriteDash()
   Blynk.virtualWrite(VP_I, vehicle.mcu.current);
   Blynk.virtualWrite(VP_V, vehicle.mcu.voltage);
   Blynk.virtualWrite(VP_T, vehicle.mcu.temp);
-  //  Serial.println("SENT");
+  Serial.println("SENT");
 }
 
 void appWriteCharge()

@@ -22,21 +22,32 @@
 
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
-#define BLYNK_USE_DIRECT_CONNECT
 
+//#define BLYNK_USE_DIRECT_CONNECT
 // #include <BlynkSimpleEsp32_BLE.h>
-#include <BlynkSimpleEsp32_BT.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
+//#include <BlynkSimpleEsp32_BT.h>
+//#include <BLEDevice.h>
+//#include <BLEServer.h>
+// You should get Auth Token in the Blynk App.
+// Go to the Project Settings (nut icon).
+//char authBT[] = "CnlLxWoZB2RbuKdGGiEIObOokHatLA2T";
 
-// #include "app_charge.h"
-// #include "app_dash.h"
-
-BlynkTimer timer;
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "CnlLxWoZB2RbuKdGGiEIObOokHatLA2T";
+char authWifi[] = "nQeT_BJ2lbWc7p4dfe6L2oc8LfZZ_6-Q";
+
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "mobile-vibes";
+char pass[] = "cheddarcheese";
+
+BlynkTimer timer;
+
+
 
 WidgetLED ledCharging(VP_charging);
 WidgetLCD lcd(VP_LCD);
@@ -56,7 +67,7 @@ int Button1 = 0;
 int Button2 = 0;
 int slider = 0;
 
-unsigned long tPeriod = 400;
+unsigned long tPeriod = 100;
 unsigned long tStart = 0;
 
 // App() : ledCharging(VP_charging) {};
