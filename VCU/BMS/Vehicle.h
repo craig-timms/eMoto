@@ -17,6 +17,8 @@ struct Vehicle
         int contactor = 0;
         int discharge = 0;
         int precharge = 0;
+        int appPre = false;
+        int appBleed = false;
     };
     
     struct Charger

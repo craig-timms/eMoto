@@ -42,8 +42,11 @@ char authWifi[] = "nQeT_BJ2lbWc7p4dfe6L2oc8LfZZ_6-Q";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "mobile-vibes";
-char pass[] = "cheddarcheese";
+//char ssid[] = "mobile-vibes";
+//char pass[] = "cheddarcheese";
+
+char ssid[] = "G&T";
+char pass[] = "goblueforever";
 
 BlynkTimer timer;
 

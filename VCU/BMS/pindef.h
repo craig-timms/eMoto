@@ -47,3 +47,8 @@
 #define CANID_STATE         0x18EB244B
 #define CANID_BATTERY       0x18EB2432
 
+// App
+#define VP_PRE 0
+#define VP_BLEED 1
+#define VP_VDIGITAL 2
+#define VP_VLEVEL 3

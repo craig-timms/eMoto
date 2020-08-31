@@ -6,6 +6,8 @@
 // #include "Signals.h"
 //#include "Motor.h"
 #include "Dash.h"
+#include "HighVoltage.h"
+#include "App.h"
 
 unsigned long StartTime = millis();
 unsigned long CurrentTime = millis();
@@ -21,12 +23,17 @@ CANbus CANb;
 // Signals signals;
 Dash dash;
 //Motor motor;
+HighVoltage HV;
+//Motor motor;
 
 void setup()
 {
   Serial.begin(9600);
   // put your setup code here, to run once:
   vehicle.state = 0;
+  appSetup();
+
+  HV.setup();
 
   //
   CANb.setup();
@@ -34,11 +41,13 @@ void setup()
   //  motor.setup();
   // monitor.setup();
   dash.setup();
+  xTaskCreatePinnedToCore(loop1, "loop1", 4096, NULL, 1, NULL, 0);
 }
 
 void loop()
 {
   StartTime = millis();
+  HV.service();
   // put your main code here, to run repeatedly:
   CANb.service(  );
   // monitor.service();
@@ -62,4 +71,11 @@ void loop()
 //  Serial.print( "    ");
 //  Serial.print("Time - ");
 //  Serial.println(ElapsedTime);
+}
+
+void loop1(void *pvParameters) {
+  while (1) {
+    appService();
+    delay(1);
+  }
 }

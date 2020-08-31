@@ -4,7 +4,7 @@ void appSetup()
   Serial.println("Waiting for connections...");
   //  Blynk.setDeviceName("eMoto");
   //  Blynk.begin(authBT);
-  Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8442);
+  Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8080);
   //    timer.setInterval(1 * 1000, reconnectBlynk);  // check every minute if still connected to server
   timer.setInterval(100L, appUpdate);
   lcd.clear();
