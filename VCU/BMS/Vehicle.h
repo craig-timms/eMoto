@@ -15,17 +15,27 @@ struct Vehicle
         int voltage = 0;
         int current = 0;
         int contactor = 0;
-        int discharge = 0;
-        int precharge = 0;
-        int appPre = false;
-        int appBleed = false;
+        bool discharge = false;
+        bool precharge = false;
+        bool HV = true;
+        bool appPre = false;
+        bool appBleed = false;
+        bool appHV = false;
     };
     
     struct Charger
     {
-        int vMax = 120;
-        int iMax = 5;
+        int vMax = 68;
+        int iMax = 1;
         int errors = 0;
+        bool enable = false;
+        bool online = false;
+        int rV = 0;
+        int rI = 0;
+        bool eTemp = false;
+        bool eVac = false;
+        bool eHW = false;
+        bool eCom = false;
     };
     
     struct MCU

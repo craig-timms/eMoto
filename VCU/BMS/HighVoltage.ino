@@ -29,46 +29,104 @@ void HighVoltage::setup(void)
 void HighVoltage::service(void)
 {
   // TODO
-  // if (not working) restart;
-
-  // TODO
-  // if (error) writeThrottle(0);
-  if ( vehicle.battery.appPre ) {
-    setPrecharge( true );
-  } else
+//  if ( vehicle.battery.appPre ) {
+//    setPrecharge( true );
+//  } else
+//  {
+//    setPrecharge( false );
+//  }
+//  
+//  if ( vehicle.battery.appBleed ) {
+//    setBleed( true );
+//  } else
+//  {
+//    setBleed( false );
+//  }
+  
+  if ( (vehicle.battery.appHV) && (HVstatus==0) ) {
+    enable( true );
+  } else if ( (!vehicle.battery.appHV) && ((HVstatus==1)||(HVstatus==2)) )
   {
+    enable( false );
+  }
+
+
+  if ( (HVstatus == 1 ) && (millis() > HVcntrlTimer + HVonHoldoff) ) {  
+    setContactor( true );  
     setPrecharge( false );
-  }
-  
-  if ( vehicle.battery.appBleed ) {
-    setBleed( true );
-  } else
-  {
+    Serial.println("HV on");
+    HVstatus = 2;
+  } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + HVoffHoldoff) ) {
     setBleed( false );
+    HVstatus = 0;
+    Serial.println("HV off");
+  } else if ( (HVstatus == 3 ) && (millis() > HVcntrlTimer + offDelayContactor) ) {
+    setBleed( true );
   }
 
-  int16_t results;
- 
-  results = ads1015.readADC_Differential_0_1();
-//  Serial.print("Differential: "); 
-//  Serial.print(results); 
-//  Serial.print("("); 
-//  Serial.print(results * 2); 
-//  Serial.println("mV)");
+  if ( HVstatus == 0 ) {            // OFF
+    // TODO
+    vehicle.battery.HV = false;
+    vehicle.battery.discharge = false;
+    vehicle.battery.precharge = false;
+  } else if ( HVstatus == 1 ) {     // ON
+    // TODO
+    vehicle.battery.HV = true;
+    vehicle.battery.discharge = false;
+    vehicle.battery.precharge = true;
+  } else if ( HVstatus == 2 ) {     // ON
+    // TODO
+    vehicle.battery.HV = true;
+    vehicle.battery.discharge = false;
+    vehicle.battery.precharge = false;
+  } else if ( HVstatus == 3 ) {     // ON
+    // TODO
+    vehicle.battery.HV = true;
+    vehicle.battery.discharge = true;
+    vehicle.battery.precharge = false;
+  } 
   
-  Serial.print("Battery: "); 
-  Serial.print(results); 
-  Serial.print("("); 
-  Serial.print(results * GAIN_VISO * 10); 
-  Serial.println("mV)");
+}
 
-  vehicle.battery.voltage = results * GAIN_VISO;
-  
+void HighVoltage::enable( bool en )
+{
+    if ( en ) { // turn-on
+//      Serial.println("Confirmed -- turn-on");
+      setBleed( false );
+      setContactor( false );
+      setPrecharge( true );
+      HVstatus = 1;
+      HVcntrlTimer = millis();
+    } else { // turn-off
+      // TODO do some pre-shutdown checks
+      setBleed( false );
+      setContactor( false );
+      setPrecharge( false );
+      HVstatus = 3;
+      HVcntrlTimer = millis();   
+    }
 }
 
 void HighVoltage::restart(void)
 {
   // TODO
+}
+
+void HighVoltage::getBatteryInfo( void )
+{
+  int16_t results;
+ 
+  results = ads1015.readADC_Differential_0_1();
+  
+  // Serial.print("Battery: "); 
+  // Serial.print(results); 
+  // Serial.print("("); 
+  // Serial.print(results * GAIN_VISO * 10); 
+  // Serial.println("mV)");
+
+  vehicle.battery.voltage = results * GAIN_VISO;
+  // TODO
+  // vehicle.battery.current = ;
 }
 
 void HighVoltage::setContactor(bool setTo)

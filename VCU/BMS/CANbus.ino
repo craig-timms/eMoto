@@ -27,59 +27,74 @@ void CANbus::service(void)
   {
     // TODO
     tMsg = millis();
+    if ( vehicle.charger.enable ) {
+      sendCharger( true, vehicle.charger.vMax, vehicle.charger.iMax, 'G' );
+    } else {
+      sendCharger( false, vehicle.charger.vMax, vehicle.charger.iMax, 'G' );
+    }
   }
+
+  if ( timerOBC > period ) { vehicle.charger.online = false; }
 }
 
 void CANbus::sendCharger(bool charge, int voltage, int current, char LED)
 {
-  uint8_t c_B0 = 0x05;
+  uint8_t bit0 = 0x05;
   if (charge)
   {
-    c_B0 = 0x04;
+    bit0 = 0x04;
   }
 
-  uint8_t c_B2 = vehicle.charger.vMax / 256;
-  uint8_t c_B1 = vehicle.charger.vMax - (c_B2 * 256);
+  uint8_t bit2 = vehicle.charger.vMax*10 / 256;
+  uint8_t bit1 = vehicle.charger.vMax*10 - (bit2 * 256);
 
-  uint8_t c_B4 = (vehicle.charger.iMax + 32000) / 256;
-  uint8_t c_B3 = (vehicle.charger.iMax + 32000) - (c_B4 * 256);
+  // uint8_t bit4 = (vehicle.charger.iMax + 32000) / 256;
+  // uint8_t bit3 = (vehicle.charger.iMax + 32000) - (bit4 * 256);
+  unit8_t bit4 = 0x0C;
+  unit8_t bit3 = 128;
+  if (vehicle.charger.iMax<=0) {
+    // do nothing
+  } else if ( vehicle.charger.iMax>255 ) {
+    bit3 = 255;
+  } else {
+    bit3 = 10*vehicle.charger.iMax + 128;
+  }
 
-  uint8_t c_B5 = 0x01;
+  uint8_t bit5 = 0x01;
   if (LED == 'r')
   {
-    c_B5 = 0x00;
+    bit5 = 0x00;
   }
   else if (LED == 'y')
   {
-    c_B5 = 0x02;
+    bit5 = 0x02;
   }
   else if (LED == 'Y')
   {
-    c_B5 = 0x03;
+    bit5 = 0x03;
   }
   else if (LED == 'g')
   {
-    c_B5 = 0x04;
+    bit5 = 0x04;
   }
   else if (LED == 'G')
   {
-    c_B5 = 0x05;
+    bit5 = 0x05;
   }
 
-  // CAN_frame_t tx_frame;
-  // tx_frame.FIR.B.FF = CAN_frame_ext;
-  // tx_frame.MsgID = 0x18E54024;
-  // tx_frame.FIR.B.DLC = 8;
-  // tx_frame.data.u8[0] = c_B0; // 0x05-stop  0x04-start
-  // tx_frame.data.u8[1] = c_B1; // voltage
-  // tx_frame.data.u8[2] = c_B2; //
-  // tx_frame.data.u8[3] = c_B3; // current
-  // tx_frame.data.u8[4] = c_B4; //
-  // tx_frame.data.u8[5] = c_B5; // LED
-  // tx_frame.data.u8[6] = 0x06; // 0xFF
-  // tx_frame.data.u8[7] = 0x07; // 0xFF
-  // ESP32Can.CANWriteFrame(&tx_frame);
-  // Serial.println("Charger CAN sent");
+  CAN.beginExtendedPacket(CANID_CONTROLS);
+  CAN.write(bit0);
+  CAN.write(bit1);
+  CAN.write(bit2);
+  CAN.write(bit3);
+  CAN.write(bit4);
+  CAN.write(bit5);
+  CAN.write(0x06);
+  CAN.write(0x07);
+  CAN.endPacket();
+  // Serial.print("5 - ");
+  delay(2);
+  Serial.println("Charger CAN sent");
 }
 
 void CANbus::readBus(void)
@@ -277,11 +292,6 @@ void CANbus::getMCU2( uint8_t msgIn[] )
   // TODO
 }
 
-void CANbus::getCharger( uint8_t msgIn[] )
-{
-  // TODO
-}
-
 void CANbus::getBattery( uint8_t msgIn[] )
 {
   // TODO
@@ -387,78 +397,44 @@ void CANbus::getBattery( uint8_t msgIn[] )
 //   }
 // }
 
-// // Charger Message In
-// if (rx_frame.MsgID == 0x18EB2440)
-// { // Charger status
 
-//   // Bits
-//   int bit0 = rx_frame.data.u8[0];
-//   int bit1 = rx_frame.data.u8[1];
-//   int bit2 = rx_frame.data.u8[2];
-//   int bit3 = rx_frame.data.u8[3];
-//   int bit4 = rx_frame.data.u8[4];
-//   int bit5 = rx_frame.data.u8[5];
-//   uint8_t bit6 = rx_frame.data.u8[6];
-//   uint8_t bit7 = rx_frame.data.u8[7];
 
-//   cVoltage = (bit3 * 256) + bit2;
-//   cCurrent = ((bit5 * 256) + bit4) - 3200;
+void CANbus::getCharger( uint8_t msgIn[] )
+{
+  timerOBC = millis();
+  vehicle.charger.online = true;
 
-//   //
-//   char ERR[8 + 1] = {};
-//   char ERR2[8 + 1] = {};
+  vehicle.charger.rV = (msgIn[3] * 256) + msgIn[2];
+  vehicle.charger.rC = ((msgIn[5] * 256) + msgIn[4]) - 3200;
 
-//   uint8_t bitsCount = 8; //      char ERR[ bitsCount*2 + 1 ];
-//   uint8_t i = 0;
-//   while (i < bitsCount)
-//   {
-//     ERR[i] = bitRead(bit0, i) + '0';
-//     ERR2[i] = bitRead(bit1, i) + '0';
-//     i += 1;
-//   }
 
-//   ERR[i] = '\0';
-//   ERR2[i] = '\0';
+  vehicle.charger.rOn = false;
+  if ((bitRead(msgIn[1], 0) == '1') & (bitRead(msgIn[1], 1) == '0'))
+  {
+    vehicle.charger.rOn = true;
+  }
 
-//   cCharging = false;
-//   if ((ERR2[0] == '1') & (ERR2[1] == '0'))
-//   {
-//     cCharging = true;
-//   }
+  vehicle.charger.eTemp = true;
+  if ( (bitRead(msgIn[0], 6) == '1') & (bitRead(msgIn[0], 7) == '0'))
+  {
+    vehicle.charger.eTemp = false;
+  }
 
-//   cErrorTemp = true;
-//   if ((ERR[6] == '1') & (ERR[7] == '0'))
-//   {
-//     cErrorTemp = false;
-//   }
+  vehicle.charger.eVac = true;
+  if ( (bitRead(msgIn[0], 4) == '1') & (bitRead(msgIn[0], 5) == '0'))
+  {
+    vehicle.charger.eVac = false;
+  }
 
-//   cErrorVac = true;
-//   if ((ERR[4] == '1') & (ERR[5] == '0'))
-//   {
-//     cErrorVac = false;
-//   }
+  vehicle.charger.eHW = true;
+  if ((bitRead(msgIn[0], 2) == '1') & (bitRead(msgIn[0], 3) == '0'))
+  {
+    vehicle.charger.eHW = false;
+  }
 
-//   cErrorHW = true;
-//   if ((ERR[2] == '1') & (ERR[3] == '0'))
-//   {
-//     cErrorHW = false;
-//   }
-
-//   cErrorCom = true;
-//   if ((ERR[0] == '1') & (ERR[1] == '0'))
-//   {
-//     cErrorCom = false;
-//   }
-
-//   Serial.print(ERR2[0]);
-//   Serial.print(ERR2[1]);
-//   Serial.print(ERR2[2]);
-//   Serial.print(ERR2[3]);
-//   Serial.print(ERR2[4]);
-//   Serial.print(ERR2[5]);
-//   Serial.print(ERR2[6]);
-//   Serial.print(ERR2[7]);
-//   Serial.println();
-//   // Serial.println(bit2, DEC);
-//   // Serial.println(bit3, DEC);
-// }
+  vehicle.charger.eCom = true;
+  if ((bitRead(msgIn[0], 0) == '1') & (bitRead(msgIn[0], 1) == '0'))
+  {
+    vehicle.charger.eCom = false;
+  }
+}

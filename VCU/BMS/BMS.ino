@@ -8,6 +8,7 @@
 #include "Dash.h"
 #include "HighVoltage.h"
 #include "App.h"
+#include "Charger.h"
 
 unsigned long StartTime = millis();
 unsigned long CurrentTime = millis();

@@ -18,7 +18,7 @@
 // Display
 #define GPIO_LED_DISPLAY    15
 
-#define NUM_LEDS_DISPLAY    7
+#define NUM_LEDS_DISPLAY    3
 
 // LV Monitor
 #define GPIO_12V_READ   32
@@ -52,3 +52,14 @@
 #define VP_BLEED 1
 #define VP_VDIGITAL 2
 #define VP_VLEVEL 3
+#define VP_HV 4
+#define VP_CHRG_I 5
+#define VP_CHRG_V 6
+#define VP_CHRG_EN 7
+#define VP_CHRG_ONLINE 8
+#define VP_CHRG_ETEMP 9
+#define VP_CHRG_EVAC 10
+#define VP_CHRG_EHW 11
+#define VP_CHRG_ECOM 12
+#define VP_CHRG_RV 13
+#define VP_CHRG_RI 14

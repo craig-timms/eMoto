@@ -1,3 +1,4 @@
+#define FASTLED_RGBW
 #include "FastLED.h"
 
 
@@ -23,12 +24,12 @@
 //
 //////////////////////////////////////////////////
 
-#define NUM_LEDS 8
+#define NUM_LEDS 3
 
 // For led chips like WS2812, which have a data line, ground, and power, you just
 // need to define DATA_PIN.
-#define DATA_PIN 22
-#define CLOCK_PIN 13
+#define DATA_PIN 15
+//#define CLOCK_PIN 13
 
 CRGB leds[NUM_LEDS];
 

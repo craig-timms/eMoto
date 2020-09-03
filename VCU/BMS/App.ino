@@ -1,5 +1,11 @@
 #include "App.h"
 
+WidgetLED onlineLED(VP_CHRG_ONLINE);
+WidgetLED eLED1(VP_CHRG_ETEMP);
+WidgetLED eLED2(VP_CHRG_EVAC);
+WidgetLED eLED3(VP_CHRG_EHW);
+WidgetLED eLED4(VP_CHRG_ECOM);
+
 void appSetup()
 {
   // Debug console
@@ -9,6 +15,13 @@ void appSetup()
   // Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8080);
   //    timer.setInterval(1 * 1000, reconnectBlynk);  // check every minute if still connected to server
   timer.setInterval(100L, appUpdate);
+  Blynk.virtualWrite(VP_CHRG_I, vehicle.charger.iMax);
+  Blynk.virtualWrite(VP_CHRG_V, vehicle.charger.vMax);
+  onlineLED.off();
+  eLED1.off();
+  eLED2.off();
+  eLED3.off();
+  eLED4.off();
 //  lcd.clear();
 //  Blynk.virtualWrite(VP_B1,  LOW);
 //  Blynk.virtualWrite(VP_B2,  LOW);
@@ -47,6 +60,39 @@ void appUpdate()
 {
   Blynk.virtualWrite(VP_VLEVEL, vehicle.battery.voltage/100);
   Blynk.virtualWrite(VP_VDIGITAL, vehicle.battery.voltage*10);
+  Blynk.virtualWrite(VP_CHRG_RV, vehicle.charger.rV);
+  Blynk.virtualWrite(VP_CHRG_RI, vehicle.charger.rI);
+
+  // Charger
+  if ( vehicle.charger.online ) {
+    onlineLED.on();
+  } else {
+    onlineLED.off();
+  }
+  
+  if ( vehicle.charger.eTemp ) {
+    eLED1.on();
+  } else {
+    eLED1.off();
+  }
+  
+  if ( vehicle.charger.eVac ) {
+    eLED2.on();
+  } else {
+    eLED2.off();
+  }
+  
+  if ( vehicle.charger.eHW ) {
+    eLED3.on();
+  } else {
+    eLED3.off();
+  }
+  
+  if ( vehicle.charger.eCom ) {
+    eLED4.on();
+  } else {
+    eLED4.off();
+  }
 }
 
 // void appWriteDash()
@@ -109,6 +155,44 @@ BLYNK_WRITE(VP_BLEED)
   {
     vehicle.battery.appBleed = false;
   }
+}
+
+BLYNK_WRITE(VP_HV)
+{
+  int Button1 = param.asInt();
+  if ( Button1 == 1 ) { 
+    vehicle.battery.appHV = true;
+  } else
+  {
+    vehicle.battery.appHV = false;
+  }
+}
+
+BLYNK_WRITE(VP_CHRG_EN)
+{
+  int Button1 = param.asInt();
+  if ( Button1 == 1 ) { 
+    vehicle.charger.enable = true;
+  } else
+  {
+    vehicle.charger.enable = false;
+  }
+}
+
+BLYNK_WRITE(VP_CHRG_I)
+{
+  int slider = param.asInt(); // assigning incoming value from pin V1 to a variable
+
+  // process received value
+  vehicle.charger.iMax = slider;
+}
+
+BLYNK_WRITE(VP_CHRG_V)
+{
+  int slider = param.asInt(); // assigning incoming value from pin V1 to a variable
+
+  // process received value
+  vehicle.charger.vMax = slider;
 }
 
 // BLYNK_WRITE(VP_SLD)

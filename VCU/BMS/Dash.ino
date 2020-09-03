@@ -1,6 +1,10 @@
 #include "Dash.h"
 #include "Bitmaps.h"
 
+const uint16_t PixelCount = 4;
+const uint8_t PixelPin = 15;
+NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> leds_dash(PixelCount, PixelPin);
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -17,8 +21,12 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 void Dash::setup(void)
 {
   // LEDs
-  FastLED.addLeds<WS2811, GPIO_LED_DISPLAY, GRB>(leds_dash, NUM_LEDS_DISPLAY);
-  FastLED.setBrightness(10);
+//  FastLED.addLeds<WS2811, GPIO_LED_DISPLAY, GRB>(leds_dash, NUM_LEDS_DISPLAY);
+  // FastLED.addLeds<WS2812B, GPIO_LED_DISPLAY, RGB>(leds_dash, getRGBWsize(NUM_LEDS_DISPLAY));
+  // FastLED.setBrightness(10);
+
+  leds_dash.Begin();
+  leds_dash.Show();
   delay(100);
 
   // Screen
@@ -36,7 +44,6 @@ void Dash::screenSetup(void)
     for (;;)
       ; // Don't proceed, loop forever
   }
-  delay(100);
 
   screen1(0);
   delay(2000);
@@ -50,18 +57,46 @@ void Dash::restart(void)
 
 void Dash::service(void)
 {
+
+  if ( millis() > (timer200ms+200) ) {
+    blink200ms = !blink200ms;
+    timer200ms = millis();
+  }
+
+  if ( millis() > (timer400ms+400) ) {
+    blink400ms = !blink400ms;
+    timer400ms = millis();
+  }
+  
   setLEDS();
   screen1(1);
-
+  
 }
 
 void Dash::setLEDS(void)
 {
-  for (int i = 0; i < NUM_LEDS_DISPLAY; i = i + 1)
-  {
-    leds_dash[i] = CRGB(255, 0, 0);
+  // for (int i = 0; i < NUM_LEDS_DISPLAY; i = i + 1)
+  // {
+  //   leds_dash[i] = CRGB(255, 0, 0);
+  // }
+  leds_dash.SetPixelColor(1, RgbwColor(0, 0, 0, 10));
+  leds_dash.SetPixelColor(2, RgbwColor(0, 0, 0, 10));
+
+  if ( vehicle.battery.precharge && (blink400ms) ) {
+    leds_dash.SetPixelColor(0, RgbwColor(80, 30, 0, 0));
+  } else if ( (vehicle.battery.precharge) && (!blink400ms) ) {
+    leds_dash.SetPixelColor(0, RgbwColor(60, 0, 0, 0));
+  } else if ( (vehicle.battery.discharge) && (blink400ms) ) {
+    leds_dash.SetPixelColor(0, RgbwColor(80, 30, 0, 0));
+  } else if ( (vehicle.battery.discharge) && (!blink400ms) ) {
+    leds_dash.SetPixelColor(0, RgbwColor(0, 0, 0, 0));
+  } else if ( vehicle.battery.HV ) {
+    leds_dash.SetPixelColor(0, RgbwColor(60, 0, 0, 0));
+  } else {
+    leds_dash.SetPixelColor(0, RgbwColor(0, 60, 0, 0));
   }
-  FastLED.show();
+
+  leds_dash.Show();
 }
 
 void Dash::screen1(int state)

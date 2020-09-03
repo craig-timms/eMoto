@@ -15,6 +15,8 @@ class HighVoltage
         void restart( void );
         void service( void );
 
+        void enable( bool );
+
 //        int getThrottle( void )         { return throttleOUT; }      // returns (0-1000)
         // int getRPM( void )              { return RPM; }
         // int getCurrent( void )          { return currentMtr; }
@@ -33,10 +35,15 @@ class HighVoltage
         // void setBleed2( bool );
         // void setBleedT( bool );
         // void setBleedB( bool );
+        void getBatteryInfo( void );
 
         int previous_state = 0;
         int current_state = 0;
         int next_state = 0;
+        
+        int HVstatus = 0;
+
+        int offDelayContactor = 400;
 
         // int tempInv = 0;
         // int tempMtr = 0;
@@ -48,6 +55,10 @@ class HighVoltage
         // int voltageDC = 0;
         // char ERR[ 16 + 1 ];
         // int HVstatus = 0;
+                
+        unsigned long HVcntrlTimer = 0;
+        unsigned long HVonHoldoff = 10000;
+        unsigned long HVoffHoldoff = 10000;
 
 };
 
