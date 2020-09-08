@@ -1,11 +1,14 @@
 #include "Dash.h"
 #include "Bitmaps.h"
 
+
+//NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> leds_dash(NUM_LEDS_DASH, );
+
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-// #include "Vehicle.h"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -30,16 +33,34 @@ Adafruit_SSD1306 display2(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define IOCON0 0x0A  // I/O EXPANDER CONTROL REGISTER 0
 #define IOCON1 0x0B  // I/O EXPANDER CONTROL REGISTER 1
 
+//NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> leds_dash(NUM_LEDS_DASH, GPIO_LED_DASH);
+// NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> leds_back(NUM_LEDS_BACK, GPIO_LED_BACK);
+
 void Dash::setup(void)
 {
-  FastLED.addLeds<WS2811, GPIO_LED_DASH, GRB>(leds_dash, NUM_LEDS_DASH);
-  FastLED.setBrightness(10);
+  // FastLED.addLeds<WS2811, GPIO_LED_DASH, GRB>(leds_dash, NUM_LEDS_DASH);
+  // FastLED.setBrightness(10);
+//  leds_dash.Begin();
+//  leds_dash.Show();
+//  delay(100);
+
+//  setWhite();
   delay(100);
+
   gpioExpander.setup();
   delay(100);
+
   screenSetup();
   // TODO - setup for screen
   // TODO - setup for GPIO EXTENSION
+}
+
+void Dash::setWhite(void)
+{
+//  for ( uint8_t i = 0; i < NUM_LEDS_DASH; i++ ) {
+//    leds_dash.SetPixelColor(i, RgbwColor(0, 0, 0, 50));
+//  }
+//  leds_dash.Show();
 }
 
 void Dash::screenSetup(void)
@@ -83,18 +104,18 @@ void Dash::service(void)
 {
   setLEDS();
   screen1(1);
-  screen2(1);
+  screen2(2);
 
   getDash();
 }
 
 void Dash::setLEDS(void)
 {
-  for (int i = 0; i < NUM_LEDS_DASH; i = i + 1)
-  {
-    leds_dash[i] = CRGB(255, 0, 0);
-  }
-  FastLED.show();
+//  for (int i = 0; i < NUM_LEDS_DASH; i = i + 1)
+//  {
+//    leds_dash[i] = CRGB(255, 0, 0);
+//  }
+//  FastLED.show();
 }
 
 void Dash::getDash(void)
@@ -351,37 +372,156 @@ void Dash::screen2( int state )
     {
       display2.println(F("OFF"));
     }
-    // display.print(vR[1], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // display.print(F("\n"));       // new line
-    // // Battery Voltage 3
-    // display2.setTextSize(1);
-    // display2.print(F("Level:    "));
-    // display2.setTextSize(2);
-    // display2.println(vehicle.controls.intensity);
-
-    // display.print(vR[2], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // // Battery Voltage 4
-    // display.print(vR[3], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // display.print(F("\n"));       // new line
-    // // Battery Voltage 5
-    // display.print(vR[4], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // display.print(F("\n"));       // new line
-    // display.display();
     display2.display();
-  }
-  else if (state == 0)
+  } else if (state == 2)
+  {
+    // MCU voltage and current
+    display2.setTextSize(2);
+    int vtemp = vehicle.mcu.voltage;
+    if ( vtemp <10 ){
+      display2.print(F("  "));
+    } else if ( vtemp < 100 ) {
+      display2.print(F(" "));
+    }
+    display2.print( vtemp );
+    display2.setTextSize(1);
+    display2.print(F("V"));
+    display2.setTextSize(2);
+    display2.print(F(" "));
+    int itemp = vehicle.mcu.current;
+    if ( itemp <10 ) {
+      display2.print(F("  "));
+    } else if ( itemp < 100 ) {
+      display2.print(F(" "));
+    }
+    display2.print( itemp );
+    display2.setTextSize(1);
+    display2.print(F("A"));
+    display2.setTextSize(2);
+    display2.println();
+    
+    // MCU direction
+    display2.setTextSize(1);
+    display2.println();
+    display2.print(F("CMD: "));
+    // display2.setTextSize(2);
+    uint8_t dirtemp = (uint8_t)vehicle.mcu.rCmd;
+    if ( dirtemp == 0 ){
+      display2.print(F("N"));
+    } else if ( vtemp == 1 ) {
+      display2.print(F("F"));
+    } else if ( vtemp == 2 ) {
+      display2.print(F("R"));
+    } else if ( vtemp == 3 ) {
+      display2.print(F("?"));
+    } else {
+      display2.print( dirtemp );
+    }
+    display2.setTextSize(1);
+    display2.print(F("  FB: "));
+    // display2.setTextSize(2);
+    dirtemp = vehicle.mcu.rDirection;
+    if ( dirtemp == 0 ){
+      display2.print(F("N"));
+    } else if ( vtemp == 1 ) {
+      display2.print(F("F"));
+    } else if ( vtemp == 2 ) {
+      display2.print(F("R"));
+    } else if ( vtemp == 3 ) {
+      display2.print(F("?"));
+    } else {
+      display2.print( dirtemp );
+    }
+    display2.println();
+    
+    // Errors
+    display2.setTextSize(1);
+//    display2.println(F("Errors:   "));
+    display2.println();
+    for ( int i = 0; i<8; i++ ) {
+      if ( bitRead(vehicle.mcu.errorsA,7-i) == 1 ) {
+        display2.print(F("1"));
+      } else {
+        display2.print(F("0"));
+      }
+      // Serial.print( bitRead(vehicle.mcu.errorsA,7-i) == 1 );
+      // Serial.print( " " );
+    }
+    // Serial.println();
+    display2.print(F(" - "));
+    for ( int i = 0; i<8; i++ ) {
+      if ( bitRead(vehicle.mcu.errorsB,7-i) ) {
+        display2.print(F("1"));
+      } else {
+        display2.print(F("0"));
+      }
+    }
+    display2.println();
+    
+    // Switch Status
+    display2.setTextSize(1);
+//    display2.println(F("Switches: "));
+    display2.println();
+    // Boost
+    if ( bitRead(vehicle.mcu.rSwStatus,7) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("BST"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // Foot
+    if ( bitRead(vehicle.mcu.rSwStatus,6) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("FT"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // Forward
+    if ( bitRead(vehicle.mcu.rSwStatus,5) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("F"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // Backward
+    if ( bitRead(vehicle.mcu.rSwStatus,4) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("R"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // 12V Brake
+    if ( bitRead(vehicle.mcu.rSwStatus,3) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("BK"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // Hall C
+    if ( bitRead(vehicle.mcu.rSwStatus,2) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("C"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // Hall B
+    if ( bitRead(vehicle.mcu.rSwStatus,1) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("B"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+    // Hall A
+    if ( bitRead(vehicle.mcu.rSwStatus,0) ) {
+      display2.setTextColor(BLACK, WHITE);
+    }
+    display2.print(F("A"));
+    display2.setTextColor(WHITE);
+    display2.print(F(" "));
+//    display.println();
+
+    display2.display();
+  } else if (state == 0)
   {
     drawBitmap2();
   }

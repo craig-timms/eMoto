@@ -1,7 +1,7 @@
 #ifndef DASH_H
 #define DASH_H
 
-#include "FastLED.h"
+//#include <NeoPixelBus.h>
 #include "MCP23016.h"
 
 MCP23016 gpioExpander;
@@ -15,6 +15,7 @@ class Dash
 
     private:
         void setLEDS( void );
+        void setWhite( void );
         void shareData( void );
         void screenSetup( void );
         void setDash( void );
@@ -36,7 +37,7 @@ class Dash
         int motorTemp2 = 0;
         int expander = 0;
 
-        CRGB leds_dash[NUM_LEDS_DASH];
+        // CRGB leds_dash[NUM_LEDS_DASH];
 
 };
 

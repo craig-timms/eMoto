@@ -23,36 +23,26 @@
 /* Comment this out to disable prints and save space */
 #define BLYNK_PRINT Serial
 
-//#define BLYNK_USE_DIRECT_CONNECT
-// #include <BlynkSimpleEsp32_BLE.h>
-//#include <BlynkSimpleEsp32_BT.h>
-//#include <BLEDevice.h>
-//#include <BLEServer.h>
-// You should get Auth Token in the Blynk App.
-// Go to the Project Settings (nut icon).
-//char authBT[] = "CnlLxWoZB2RbuKdGGiEIObOokHatLA2T";
+#define BLYNK_USE_DIRECT_CONNECT
+#include <BlynkSimpleEsp32_BT.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+char authBT[] = "CnlLxWoZB2RbuKdGGiEIObOokHatLA2T";
 
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
-
-// You should get Auth Token in the Blynk App.
-// Go to the Project Settings (nut icon).
-char authWifi[] = "nQeT_BJ2lbWc7p4dfe6L2oc8LfZZ_6-Q";
+// #include <WiFi.h>
+// #include <WiFiClient.h>
+// #include <BlynkSimpleEsp32.h>
+// char authWifi[] = "nQeT_BJ2lbWc7p4dfe6L2oc8LfZZ_6-Q";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
 //char ssid[] = "mobile-vibes";
 //char pass[] = "cheddarcheese";
 
-char ssid[] = "G&T";
-char pass[] = "goblueforever";
-
 BlynkTimer timer;
 
-
-
 WidgetLED ledCharging(VP_charging);
+WidgetLED ledMCU(VP_MCU_ONLINE);
 WidgetLCD lcd(VP_LCD);
 
 void appSetup();

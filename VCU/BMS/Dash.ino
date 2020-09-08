@@ -79,21 +79,21 @@ void Dash::setLEDS(void)
   // {
   //   leds_dash[i] = CRGB(255, 0, 0);
   // }
-  leds_dash.SetPixelColor(1, RgbwColor(0, 0, 0, 10));
-  leds_dash.SetPixelColor(2, RgbwColor(0, 0, 0, 10));
+  leds_dash.SetPixelColor(1, RgbwColor(0, 0, 0, 2));
+  leds_dash.SetPixelColor(2, RgbwColor(0, 0, 0, 2));
 
   if ( vehicle.battery.precharge && (blink400ms) ) {
-    leds_dash.SetPixelColor(0, RgbwColor(80, 30, 0, 0));
+    leds_dash.SetPixelColor(0, RgbwColor(40, 15, 0, 0));
   } else if ( (vehicle.battery.precharge) && (!blink400ms) ) {
-    leds_dash.SetPixelColor(0, RgbwColor(60, 0, 0, 0));
+    leds_dash.SetPixelColor(0, RgbwColor(20, 0, 0, 0));
   } else if ( (vehicle.battery.discharge) && (blink400ms) ) {
-    leds_dash.SetPixelColor(0, RgbwColor(80, 30, 0, 0));
+    leds_dash.SetPixelColor(0, RgbwColor(40, 15, 0, 0));
   } else if ( (vehicle.battery.discharge) && (!blink400ms) ) {
     leds_dash.SetPixelColor(0, RgbwColor(0, 0, 0, 0));
   } else if ( vehicle.battery.HV ) {
-    leds_dash.SetPixelColor(0, RgbwColor(60, 0, 0, 0));
+    leds_dash.SetPixelColor(0, RgbwColor(20, 0, 0, 0));
   } else {
-    leds_dash.SetPixelColor(0, RgbwColor(0, 60, 0, 0));
+    leds_dash.SetPixelColor(0, RgbwColor(0, 20, 0, 0));
   }
 
   leds_dash.Show();

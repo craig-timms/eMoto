@@ -29,35 +29,49 @@ void CANbus::service(void)
     tMsg = millis();
     if ( vehicle.charger.enable ) {
       sendCharger( true, vehicle.charger.vMax, vehicle.charger.iMax, 'G' );
+      Serial.println("Charger enable CAN sent");
     } else {
       sendCharger( false, vehicle.charger.vMax, vehicle.charger.iMax, 'G' );
+      //      Serial.println("Charger DISABLE CAN sent");
     }
   }
 
-  if ( timerOBC > period ) { vehicle.charger.online = false; }
+  vehicle.charger.online = false;
+  if ( millis() < (timerOBC + period) ) {
+    vehicle.charger.online = true;
+  }
+  vehicle.mcu.online = false;
+  if ( millis() < (timerMCU + period) ) {
+    vehicle.mcu.online = true;
+  }
 }
 
 void CANbus::sendCharger(bool charge, int voltage, int current, char LED)
 {
-  uint8_t bit0 = 0x05;
+  uint8_t bit0 = 0xFD;
   if (charge)
   {
-    bit0 = 0x04;
+    bit0 = 0xFC;
   }
 
-  uint8_t bit2 = vehicle.charger.vMax*10 / 256;
-  uint8_t bit1 = vehicle.charger.vMax*10 - (bit2 * 256);
+  // uint8_t bit2 = vehicle.charger.vMax*10 / 256;
+  // uint8_t bit1 = vehicle.charger.vMax*10 - (bit2 * 256);
+  //  uint8_t bit1 = 0xA0;
+  //  uint8_t bit2 = 0x02;
+  uint8_t bit1 = vehicle.charger.vMax * 10 - 512;
+  uint8_t bit2 = 0x02;
+
 
   // uint8_t bit4 = (vehicle.charger.iMax + 32000) / 256;
   // uint8_t bit3 = (vehicle.charger.iMax + 32000) - (bit4 * 256);
-  unit8_t bit4 = 0x0C;
-  unit8_t bit3 = 128;
-  if (vehicle.charger.iMax<=0) {
+  uint8_t bit4 = 0x0C;
+  uint8_t bit3 = 128;
+  if (vehicle.charger.iMax <= 0) {
     // do nothing
-  } else if ( vehicle.charger.iMax>255 ) {
+  } else if ( vehicle.charger.iMax > 255 ) {
     bit3 = 255;
   } else {
-    bit3 = 10*vehicle.charger.iMax + 128;
+    bit3 = 10 * vehicle.charger.iMax + 128;
   }
 
   uint8_t bit5 = 0x01;
@@ -82,34 +96,42 @@ void CANbus::sendCharger(bool charge, int voltage, int current, char LED)
     bit5 = 0x05;
   }
 
-  CAN.beginExtendedPacket(CANID_CONTROLS);
+  CAN.beginExtendedPacket(CANID_CHARGER_SET);
   CAN.write(bit0);
   CAN.write(bit1);
   CAN.write(bit2);
   CAN.write(bit3);
   CAN.write(bit4);
   CAN.write(bit5);
-  CAN.write(0x06);
-  CAN.write(0x07);
+  CAN.write(0xFF);
+  CAN.write(0xFF);
   CAN.endPacket();
   // Serial.print("5 - ");
   delay(2);
-  Serial.println("Charger CAN sent");
+  //  Serial.println("Charger CAN sent");
 }
 
 void CANbus::readBus(void)
 {
-  int packetSize = CAN.parsePacket();
+//  int packetSize = CAN.parsePacket();
   uint8_t msg[8] = { 0 };
+  int packets = 0;
 
-  if (packetSize)
+  while ( CAN.parsePacket() != 0 )
   {
+    //    Serial.print("Packet Size: ");
+    //    Serial.println(packetSize);
+    packets++;
     for (int msgi = 0; msgi < 8; msgi++)
     {
       if (CAN.available())
       {
         msg[msgi] = CAN.read();
       }
+    }
+
+    while( CAN.available() ) {
+      CAN.read();
     }
 
     if (CAN.packetId() == CANID_CONTROLS)
@@ -124,6 +146,15 @@ void CANbus::readBus(void)
     {
       getMCU2( msg );
     }
+    else if (CAN.packetId() == CANID_CHARGER_GET)
+    {
+      getCharger( msg );
+    }
+  }
+
+  if ( packets > 0 ) {
+//    Serial.print("Packets: ");
+//    Serial.println(packets);
   }
 
 
@@ -282,11 +313,6 @@ bool CANbus::getOnline(void)
 }
 
 
-void CANbus::getMCU1( uint8_t msgIn[] )
-{
-  // TODO
-}
-
 void CANbus::getMCU2( uint8_t msgIn[] )
 {
   // TODO
@@ -397,6 +423,33 @@ void CANbus::getBattery( uint8_t msgIn[] )
 //   }
 // }
 
+void CANbus::getMCU1(uint8_t msgIn[])
+{
+  timerMCU = millis();
+  // Speed, Current, Voltage
+  vehicle.mcu.RPM = ((msgIn[1] * 256) + msgIn[0]);
+  vehicle.mcu.current = ((msgIn[3] * 256) + msgIn[2]) / 10;
+  vehicle.mcu.voltage = ((msgIn[5] * 256) + msgIn[4]) / 10;
+  vehicle.mcu.errorA = msgIn[6];
+  vehicle.mcu.errorb = msgIn[7];
+
+  uint8_t bitsCount = 8;
+  //      char ERR[ bitsCount*2 + 1 ];
+
+  uint8_t i = 0;
+  //      uint8_t j = 0;
+  while (i < bitsCount)
+  {
+    mERR[i] = bitRead(msgIn[6], i) + '0';
+    i += 1;
+  }
+  while ((i < bitsCount * 2) && (i >= bitsCount))
+  {
+    mERR[i] = bitRead(msgIn[7], i - bitsCount) + '0';
+    i += 1;
+  }
+  mERR[i] = '\0';
+}
 
 
 void CANbus::getCharger( uint8_t msgIn[] )
@@ -405,7 +458,7 @@ void CANbus::getCharger( uint8_t msgIn[] )
   vehicle.charger.online = true;
 
   vehicle.charger.rV = (msgIn[3] * 256) + msgIn[2];
-  vehicle.charger.rC = ((msgIn[5] * 256) + msgIn[4]) - 3200;
+  vehicle.charger.rI = ((msgIn[5] * 256) + msgIn[4]) - 3200;
 
 
   vehicle.charger.rOn = false;

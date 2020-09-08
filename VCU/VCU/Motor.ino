@@ -67,7 +67,36 @@ Motor::service( void )
     // TODO
     // if (error) writeThrottle(0);
 
-    setThrottle( vehicle.controls.throttle );
+    if ( vehicle.controls.S1 ) {
+      vehicle.mcu.enable = true;
+    } else {
+      vehicle.mcu.enable = false;
+    }
+    setMCUpower( vehicle.mcu.enable );
+    
+    if ( vehicle.controls.gear == 2 ) {
+      setThrottle( 0 );
+    } else {
+      setThrottle( vehicle.controls.throttle );
+    }
+    
+    if ( vehicle.controls.gear == 1 ) {
+      vehicle.mcu.reverse = true;
+    } else {
+      vehicle.mcu.reverse = false;
+    }
+    setFoot( vehicle.mcu.reverse );
+    
+    if ( vehicle.controls.regen > 50 ) {
+    // if ( vehicle.controls.gear == 2 ) {
+      vehicle.mcu.brakeAN = true;
+      setBrakeAN( true );
+      setBrake( (vehicle.controls.regen-50)/4 );
+    } else {
+      vehicle.mcu.brakeAN = false;
+      setBrakeAN( false );
+      setBrake( 0 );
+    }
 }
 
 void

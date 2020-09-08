@@ -47,6 +47,8 @@ void setup()
 
 void loop()
 {
+//  Serial.print("Battery Voltage: ");
+//  Serial.println( vehicle.battery.voltage );
   StartTime = millis();
   HV.service();
   // put your main code here, to run repeatedly:

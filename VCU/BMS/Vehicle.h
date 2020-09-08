@@ -32,6 +32,7 @@ struct Vehicle
         bool online = false;
         int rV = 0;
         int rI = 0;
+        int rOn = false;
         bool eTemp = false;
         bool eVac = false;
         bool eHW = false;
@@ -48,7 +49,9 @@ struct Vehicle
         int temp = 0;
         int tempM1 = 0;
         int tempM2 = 0;
-        int errors = 0;
+        int errorA = 0;
+        int errorb = 0;
+        bool online = false;
     };
     
     struct Lights

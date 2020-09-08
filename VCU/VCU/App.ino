@@ -2,11 +2,14 @@ void appSetup()
 {
   // Debug console
   Serial.println("Waiting for connections...");
-  //  Blynk.setDeviceName("eMoto");
-  //  Blynk.begin(authBT);
-  Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8080);
+  Blynk.setDeviceName("eMoto");
+  Blynk.begin(authBT);
+
+  // Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8080);
   //    timer.setInterval(1 * 1000, reconnectBlynk);  // check every minute if still connected to server
+
   timer.setInterval(100L, appUpdate);
+
   lcd.clear();
   Blynk.virtualWrite(VP_B1,  LOW);
   Blynk.virtualWrite(VP_B2,  LOW);
@@ -46,7 +49,7 @@ void appUpdate()
 
   appWriteDash();
   appWriteCharge();
-  Serial.println( Blynk.connected() );
+//  Serial.println( Blynk.connected() );
 }
 
 void appWriteDash()
@@ -56,7 +59,34 @@ void appWriteDash()
   Blynk.virtualWrite(VP_I, vehicle.mcu.current);
   Blynk.virtualWrite(VP_V, vehicle.mcu.voltage);
   Blynk.virtualWrite(VP_T, vehicle.mcu.temp);
-  Serial.println("SENT");
+  if ( vehicle.mcu.online ) {
+    ledMCU.on();
+  } else {
+    ledMCU.off();
+  }
+
+//  Serial.println("SENT");
+}
+
+BLYNK_WRITE(VP_MCU_POWER)
+{
+  vehicle.mcu.enable = param.asInt(); // assigning incoming value from pin V1 to a variabl
+  Serial.println("Enable set");
+}
+
+BLYNK_WRITE(VP_MCU_REVERSE)
+{
+  vehicle.mcu.reverse = param.asInt(); // assigning incoming value from pin V1 to a variabl
+}
+
+BLYNK_WRITE(VP_MCU_BRAKEAN)
+{
+  vehicle.mcu.brakeAN = param.asInt(); // assigning incoming value from pin V1 to a variabl
+}
+
+BLYNK_WRITE(VP_MCU_BRAKETH)
+{
+  vehicle.mcu.brakeThrottle = param.asInt(); // assigning incoming value from pin V1 to a variabl
 }
 
 void appWriteCharge()

@@ -1,10 +1,10 @@
 #include <Arduino.h>
-#include "Vehicle.h"
 #include "pindef.h"
+#include "Vehicle.h"
 #include "Monitor.h"
 #include "CANbus.h"
 #include "Signals.h"
-//#include "Motor.h"
+#include "Motor.h"
 #include "Dash.h"
 #include "App.h"
 
@@ -18,7 +18,7 @@ Monitor monitor;
 CANbus CANb;
 Signals signals;
 Dash dash;
-//Motor motor;
+Motor motor;
 
 unsigned long delayStart = 0;
 unsigned long delay_ms = 200;
@@ -44,6 +44,8 @@ void setup()
   Serial.println("Monitor setup");
   dash.setup();
   Serial.println("Dash setup");
+  motor.setup();
+  Serial.println("Motor setup");
   delayStart = millis();
 
   xTaskCreatePinnedToCore(loop1, "loop1", 4096, NULL, 1, NULL, 0);
@@ -79,6 +81,7 @@ void loop()
   //
 
   CANb.service();
+  motor.service();
 
   //  CurrentTime = millis();
   //  ElapsedTime = CurrentTime - StartTime;

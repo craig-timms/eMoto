@@ -34,15 +34,27 @@ struct Vehicle
     
     struct MCU
     {
+        bool enabled = false;
+        bool online = false;
         int gear = 0;
         int throttle = 0;
         int voltage = 0;
         int current = 0;
         int RPM = 0;
+
         int temp = 0;
-        int tempM1 = 0;
-        int tempM2 = 0;
-        int errors = 0;
+        int tempM = 0;
+        uint8_t errorsA = 0;
+        uint8_t errorsB = 0;
+        uint8_t rDirection = 0;
+        uint8_t rCmd = 0;
+        uint8_t rSwStatus = 0;
+        int rThrottle = 0;
+
+        bool enable = false;
+        bool reverse = false;
+        bool brakeAN = false;
+        int brakeThrottle = 0;
     };
     
     struct Lights
@@ -51,6 +63,8 @@ struct Vehicle
         int brake = 0;
         int beams = 0;
         int angel = 0;
+        // bool DRL = true;
+        uint8_t DRL[5] = {1, 0, 0, 0, 30};
     };
     
     struct Controls

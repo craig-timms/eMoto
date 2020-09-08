@@ -9,6 +9,8 @@
 
 unsigned long tMsg = millis();
 unsigned long tMsgPeriod = 100;
+unsigned long period = 2000;
+unsigned long timerMCU = millis();
 
 class CANbus
 {
@@ -19,15 +21,16 @@ class CANbus
         void readBus( void );
         
         void sendControls( void );
-        void getControls( uint8_t msgIn[] );
+        void getControls( uint8_t[8] );
 
         // TODO
-        void getMCU1( uint8_t msgIn[] );
-        void getMCU2( uint8_t msgIn[] );
-        void getCharger( uint8_t msgIn[] );
-        void getBattery( uint8_t msgIn[] );
+        void getMCU1( uint8_t[8] );
+        void getMCU2( uint8_t[8] );
+        void getCharger( uint8_t[8] );
+        void getBattery( uint8_t[8] );
 
         void sendCharger( bool, int, int, char );
+        void readCharger( );
         
         int getcVoltage( void )         { return cVoltage; }      
         int getcCurrent( void )         { return cCurrent; }

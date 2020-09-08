@@ -14,6 +14,7 @@ void appSetup()
    Blynk.begin(authBT);
   // Blynk.begin(authWifi, ssid, pass, "blynk-cloud.com", 8080);
   //    timer.setInterval(1 * 1000, reconnectBlynk);  // check every minute if still connected to server
+
   timer.setInterval(100L, appUpdate);
   Blynk.virtualWrite(VP_CHRG_I, vehicle.charger.iMax);
   Blynk.virtualWrite(VP_CHRG_V, vehicle.charger.vMax);
@@ -63,11 +64,21 @@ void appUpdate()
   Blynk.virtualWrite(VP_CHRG_RV, vehicle.charger.rV);
   Blynk.virtualWrite(VP_CHRG_RI, vehicle.charger.rI);
 
+  Blynk.virtualWrite(VP_MCU_RV, vehicle.mcu.voltage);
+  Blynk.virtualWrite(VP_MCU_RI, vehicle.mcu.current);
+  
+  // Charger
+  if ( vehicle.mcu.online ) {
+    ledMCU.on();
+  } else {
+    ledMCU.off();
+  }
+
   // Charger
   if ( vehicle.charger.online ) {
-    onlineLED.on();
+    ledOBC.on();
   } else {
-    onlineLED.off();
+    ledOBC.off();
   }
   
   if ( vehicle.charger.eTemp ) {

@@ -11,6 +11,7 @@ unsigned long tMsg = millis();
 unsigned long tMsgPeriod = 100;
 unsigned long period = 2000;
 unsigned long timerOBC = millis();
+unsigned long timerMCU = millis();
 
 class CANbus
 {

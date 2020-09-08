@@ -1,7 +1,7 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-#include "FastLED.h"
+#include <NeoPixelBus.h>
 
 class Signals
 {
@@ -13,9 +13,14 @@ class Signals
     private:
         void setLights( void );
         void setHorn( void );
+        void setLeft( bool );
+        void setRight( bool );
 
-        CRGB leds_turn[NUM_LEDS_TURN];
-        CRGB leds_back[NUM_LEDS_B];
+        void setWhite( bool, bool, bool );
+
+        bool turnEn = false;
+        unsigned long turnPeriod = 500;
+        unsigned long turnTimer = 0;
 
 };
 

@@ -12,13 +12,14 @@ void CANbus::setup(void)
   // ESP32Can.CANInit();
 
   // start the CAN bus at 250 kbps
-  if (!CAN.begin(250E3)) {
+  if (!CAN.begin(250E3))
+  {
     Serial.println("Starting CAN failed!");
-    while (1);
+    while (1)
+      ;
   }
 
   Serial.println("CAN Setup -- Finished");
-
 }
 
 void CANbus::restart(void)
@@ -91,11 +92,20 @@ void CANbus::sendCharger(bool charge, int voltage, int current, char LED)
 
 void CANbus::readBus(void)
 {
-  int packetSize = CAN.parsePacket();
-  uint8_t msg[8] = { 0 };
+  // int packetSize = CAN.parsePacket();
+  uint8_t msg[8] = {0};
+  int packets = 0;
 
-  if (packetSize)
+  if ( millis() < (timerMCU + period) ) {
+    vehicle.mcu.online = true;
+  } else {
+    vehicle.mcu.online = false;
+  }
+
+  while ( CAN.parsePacket() > 0 )
   {
+    packets++;
+    //    Serial.println( CAN.packetId() );
     for (int msgi = 0; msgi < 8; msgi++)
     {
       if (CAN.available())
@@ -104,52 +114,61 @@ void CANbus::readBus(void)
       }
     }
 
-    if (CAN.packetId() == CANID_CONTROLS)
+    int ID = CAN.packetId();
+    
+//    if (ID == CANID_CONTROLS)
+//    {
+//      getControls(msg);
+//    }
+    if (ID == CANID_MCU_1)
     {
-      getControls( msg );
+      getMCU1(msg);
     }
-    else if (CAN.packetId() == CANID_MCU_1)
+    else if (ID == CANID_MCU_2)
     {
-      getMCU1( msg );
+      getMCU2(msg);
     }
-    else if (CAN.packetId() == CANID_MCU_2)
+    else if (ID == CANID_CHARGER_SET)
     {
-      getMCU2( msg );
+      getCharger(msg);
     }
+//    Serial.print( ID, HEX );
+//    Serial.print(" - ");
   }
 
-
+//  if ( packets > 0 ) { Serial.println(); };
+  
 }
 
-void CANbus::getControls( uint8_t msgIn[] )
-{
-  // Bool
-  vehicle.controls.key = bitRead(msgIn[0], 0);
-  vehicle.controls.brake = bitRead(msgIn[0], 1);
-  vehicle.controls.horn = bitRead(msgIn[0], 2);
-  vehicle.controls.headlights = bitRead(msgIn[0], 3);
-  vehicle.controls.S1 = bitRead(msgIn[0], 4);
-  vehicle.controls.S2 = bitRead(msgIn[0], 5);
-  vehicle.controls.AUX1 = bitRead(msgIn[0], 6);
-  vehicle.controls.AUX2 = bitRead(msgIn[0], 7);
-  vehicle.controls.AUX3 = bitRead(msgIn[0], 8);
-  vehicle.controls.AUX4 = bitRead(msgIn[0], 9);
-
-  // Throttle
-  vehicle.controls.throttle = 5 * msgIn[1];
-  vehicle.controls.regen = 5 * msgIn[2];
-
-  // Other
-  vehicle.controls.gear = msgIn[3];
-  vehicle.controls.intensity = msgIn[4];
-  vehicle.controls.turn = msgIn[5];
-  vehicle.controls.angel = msgIn[6];
-}
+//void CANbus::getControls(uint8_t msgIn[])
+//{
+//  // Bool
+//  vehicle.controls.key = bitRead(msgIn[0], 0);
+//  vehicle.controls.brake = bitRead(msgIn[0], 1);
+//  vehicle.controls.horn = bitRead(msgIn[0], 2);
+//  vehicle.controls.headlights = bitRead(msgIn[0], 3);
+//  vehicle.controls.S1 = bitRead(msgIn[0], 4);
+//  vehicle.controls.S2 = bitRead(msgIn[0], 5);
+//  vehicle.controls.AUX1 = bitRead(msgIn[0], 6);
+//  vehicle.controls.AUX2 = bitRead(msgIn[0], 7);
+//  vehicle.controls.AUX3 = bitRead(msgIn[0], 8);
+//  vehicle.controls.AUX4 = bitRead(msgIn[0], 9);
+//
+//  // Throttle
+//  vehicle.controls.throttle = 5 * msgIn[1];
+//  vehicle.controls.regen = 5 * msgIn[2];
+//
+//  // Other
+//  vehicle.controls.gear = msgIn[3];
+//  vehicle.controls.intensity = msgIn[4];
+//  vehicle.controls.turn = msgIn[5];
+//  vehicle.controls.angel = msgIn[6];
+//}
 
 void CANbus::sendControls(void)
 {
-  Serial.println();
-  Serial.print("Sending packet ... ");
+  //  Serial.println();
+  //  Serial.print("Sending packet ... ");
   // Bool
   uint8_t bit0 = 0;
 
@@ -164,9 +183,9 @@ void CANbus::sendControls(void)
   bitWrite(bit0, 8, vehicle.controls.AUX3);
   bitWrite(bit0, 9, vehicle.controls.AUX4);
 
-  Serial.print("bools set - ");
-  Serial.print(bit0, HEX);
-  Serial.print(" - ");
+  //  Serial.print("bools set - ");
+  //  Serial.print(bit0, HEX);
+  //  Serial.print(" - ");
 
   // Throttle
   uint8_t bit1 = vehicle.controls.throttle / 5;
@@ -178,11 +197,11 @@ void CANbus::sendControls(void)
   uint8_t bit5 = vehicle.controls.turn;
   uint8_t bit6 = vehicle.controls.angel;
 
-  Serial.print("ints set - ");
-  Serial.print(bit1, HEX);
-  Serial.print(" ");
-  Serial.print(bit2, HEX);
-  Serial.print(" - ");
+  //  Serial.print("ints set - ");
+  //  Serial.print(bit1, HEX);
+  //  Serial.print(" ");
+  //  Serial.print(bit2, HEX);
+  //  Serial.print(" - ");
 
   CAN.beginExtendedPacket(CANID_CONTROLS);
   CAN.write(bit0);
@@ -194,9 +213,9 @@ void CANbus::sendControls(void)
   CAN.write(bit6);
   CAN.write(0x00);
   CAN.endPacket();
-  // Serial.print("5 - ");
+  //  Serial.println("Controls Sent");
   delay(2);
-  Serial.println("Controls CAN sent");
+  //  Serial.println("Controls CAN sent");
 }
 
 void CANbus::sendOnline(void)
@@ -273,27 +292,95 @@ bool CANbus::getOnline(void)
   return out;
 }
 
+void CANbus::getMCU1(uint8_t msgIn[])
+{
+  timerMCU = millis();
+  // Speed, Current, Voltage
+  vehicle.mcu.RPM = ((msgIn[1] * 256) + msgIn[0]);
+  vehicle.mcu.current = ((msgIn[3] * 256) + msgIn[2]) / 10;
+  vehicle.mcu.voltage = (((int)msgIn[5] * 256) + (int)msgIn[4]) / 10;
+  //  Serial.print("MCU Voltage: ");
+  //  Serial.print(vehicle.mcu.voltage);
+  //  Serial.print("  bit4: 0x");
+  //  Serial.print(msgIn[4], HEX);
+  //  Serial.print("  bit5: 0x");
+  //  Serial.println(msgIn[5], HEX);
 
-void CANbus::getMCU1( uint8_t msgIn[] )
+  vehicle.mcu.errorsA = msgIn[6];
+  vehicle.mcu.errorsB = msgIn[7];
+
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[0], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[1], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[2], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[3], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[4], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[5], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[6], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[7], HEX);
+
+}
+
+void CANbus::getMCU2(uint8_t msgIn[])
+{
+  vehicle.mcu.rThrottle = msgIn[0];
+  vehicle.mcu.temp = msgIn[1]-40;
+  vehicle.mcu.tempM = msgIn[2]-30;
+
+  vehicle.mcu.rDirection = (bitRead(msgIn[4],3) << 1) | bitRead(msgIn[4],2);
+  vehicle.mcu.rCmd = (bitRead(msgIn[4],1)<<1) | bitRead(msgIn[4],0);
+  vehicle.mcu.rSwStatus = msgIn[5];
+  
+//  Serial.print(" ----- 0x");
+//  Serial.print(msgIn[0], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[1], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[2], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[3], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[4], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[5], HEX);
+//  Serial.print(" 0x");
+//  Serial.print(msgIn[6], HEX);
+//  Serial.print(" 0x");
+//  Serial.println(msgIn[7], HEX);
+//  delay(10);
+}
+
+void CANbus::getCharger(uint8_t msgIn[])
+{
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[0], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[1], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[2], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[3], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[4], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[5], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.print(msgIn[6], HEX);
+  //  Serial.print(" 0x");
+  //  Serial.println(msgIn[7], HEX);
+}
+
+void CANbus::getBattery(uint8_t msgIn[])
 {
   // TODO
 }
-
-void CANbus::getMCU2( uint8_t msgIn[] )
-{
-  // TODO
-}
-
-void CANbus::getCharger( uint8_t msgIn[] )
-{
-  // TODO
-}
-
-void CANbus::getBattery( uint8_t msgIn[] )
-{
-  // TODO
-}
-
 
 // if (rx_frame.MsgID == 0x0CF11E05)
 //   // Bits

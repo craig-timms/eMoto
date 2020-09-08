@@ -52,7 +52,8 @@ char authBT[] = "b0RT4FCAQTMxt83fbb7TeERXjTueZBiZ";
 
 
 
-//WidgetLED ledCharging(VP_charging);
+WidgetLED ledOBC(VP_CHRG_ONLINE);
+WidgetLED ledMCU(VP_MCU_ONLINE);
 //WidgetLCD lcd(VP_LCD);
 
 void appSetup();

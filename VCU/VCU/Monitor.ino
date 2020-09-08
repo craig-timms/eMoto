@@ -2,15 +2,15 @@
 // #include "Vehicle.h"
 
 #define POT_OFFSET          850
-#define throttle_ave_n      8
+#define throttle_ave_n      4
 int potValue = 0;
 int throttle_ave = 0;
 int throttle_i = 0;
 int throttle_sum = 0;
 int throttle_filter[throttle_ave_n] = {0};
 
-#define POT_OFFSET_R          250
-#define regen_ave_n      8
+#define POT_OFFSET_R    250
+#define regen_ave_n     4
 int potValueR = 0;
 int regen_ave = 0;
 int regen_i = 0;
