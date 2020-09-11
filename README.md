@@ -1,5 +1,6 @@
 # Todos
 ## VCU
+-Startup cycle/state (?)
 -toggle MCU power <br>
 ---if LV error, toggle (?) <br>
 -add CAN online to screen <br>
@@ -12,6 +13,7 @@
 ---OBC <br>
 
 ## BMS
+-Startup cycle/state (?)
 -add CAN online to screen <br>
   ---Lockout HV with no VCU  <br>
 -check MCU or OBC HV with measures HV  <br>
