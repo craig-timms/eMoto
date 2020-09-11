@@ -14,7 +14,7 @@ class Dash
         void service( void );
 
     private:
-        void setLEDS( void );
+        void setLEDS( int );
         void setWhite( void );
         void shareData( void );
         void screenSetup( void );

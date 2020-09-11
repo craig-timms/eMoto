@@ -102,30 +102,63 @@ void Dash::restart(void)
 
 void Dash::service(void)
 {
-  setLEDS();
-  screen1(1);
-  screen2(2);
+  if ( vehicle.controls.state==0 ) {
+    setLEDS( 0 );
+    screen1(3);
+    screen2(3);
+  } else if ( vehicle.controls.state==1 ) {
+    setLEDS();
+    screen1(1);
+    screen2(2);
+  }
 
   getDash();
 }
 
-void Dash::setLEDS(void)
+void Dash::setLEDS( int state )
 {
-//  for (int i = 0; i < NUM_LEDS_DASH; i = i + 1)
-//  {
-//    leds_dash[i] = CRGB(255, 0, 0);
-//  }
-//  FastLED.show();
+  if ( state == 0 ) {
+    for ( uint8_t i = DASH_LED_START; i < DASH_LED_END; i++ ) {
+      leds.SetPixelColor(i, RgbwColor(70, 30, 0, 0));
+    }
+  } else if ( state == 1 ) {
+    // BMS 1st LED
+    if ( !vehicle.battery.online ) {
+      leds.SetPixelColor(DASH_LED_1, RgbwColor(70, 30, 0, 0));
+    } else if ( vehicle.battery.fault ) {
+      leds.SetPixelColor(DASH_LED_1, RgbwColor(70, 0, 0, 0));
+    } else {
+      leds.SetPixelColor(DASH_LED_1, RgbwColor(0, 70, 0, 0));
+    }
+    
+    // MCU 2nd LED
+    if ( !vehicle.mcu.online ) {
+      leds.SetPixelColor(DASH_LED_2, RgbwColor(70, 30, 0, 0));
+    } else if ( vehicle.mcu.fault ) {
+      leds.SetPixelColor(DASH_LED_2, RgbwColor(70, 0, 0, 0));
+    } else {
+      leds.SetPixelColor(DASH_LED_2, RgbwColor(0, 70, 0, 0));
+    }
+    
+    // OBC 3rd LED
+    if ( !vehicle.charger.online ) {
+      leds.SetPixelColor(DASH_LED_3, RgbwColor(70, 30, 0, 0));
+    } else if ( vehicle.charger.fault ) {
+      leds.SetPixelColor(DASH_LED_3, RgbwColor(70, 0, 0, 0));
+    } else {
+      leds.SetPixelColor(DASH_LED_3, RgbwColor(0, 70, 0, 0));
+    }
+    
+    // for ( uint8_t i = DASH_LED_4; i < DASH_LED_END; i++ ) {
+    //   leds.SetPixelColor(i, RgbwColor(70, 30, 0, 0));
+    // }
+  }
+  leds.Show();
 }
 
 void Dash::getDash(void)
 {
   expander = gpioExpander.readArr();
-  // for (int i = 15; i >= 0; i--)
-  // {
-  //   Serial.print(bitRead(expander, i));
-  // }
-  // Serial.print(" - ");
 
   // Gear
   if (bitRead(expander, 0) == 1)
@@ -278,38 +311,22 @@ void Dash::screen1(int state)
     display.print(F("Regen:    "));
     display.setTextSize(2);
     display.println(vehicle.controls.regen);
-    // display.print(vR[1], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // display.print(F("\n"));       // new line
-    // // Battery Voltage 3
     display.setTextSize(1);
     display.print(F("Level:    "));
     display.setTextSize(2);
     display.println(vehicle.controls.intensity);
-    // display.print(vR[2], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // // Battery Voltage 4
-    // display.print(vR[3], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // display.print(F("\n"));       // new line
-    // // Battery Voltage 5
-    // display.print(vR[4], 2);
-    // display.setTextSize(1);
-    // display.print(F("V "));
-    // display.setTextSize(2);
-    // display.print(F("\n"));       // new line
-    // display.display();
     display.display();
   }
   else if (state == 0)
   {
     drawBitmap1();
+  }
+  else if (state == 3)
+  {
+    // Not in park at startup
+    display.setTextSize(4);
+    display.println(F("GO TO"));
+    display.println(F("PARK"));
   }
 }
 
@@ -524,6 +541,13 @@ void Dash::screen2( int state )
   } else if (state == 0)
   {
     drawBitmap2();
+  }
+  else if (state == 3)
+  {
+    // Not in park at startup
+    display2.setTextSize(4);
+    display2.println(F("GO TO"));
+    display2.println(F("PARK"));
   }
 }
 

@@ -44,7 +44,7 @@ void HighVoltage::service(void)
   //    setBleed( false );||vehicle.controls.gear==4
   //  }
 
-  if ((vehicle.controls.gear > 0) && (HVstatus == 0))
+  if ( (vehicle.controls.gear > 0) && (HVstatus == 0) && (vehicle.mcu.state == 1) )
   {
     enable(true);
   }

@@ -41,17 +41,28 @@ struct Vehicle
     
     struct MCU
     {
+        bool enabled = false;
+        bool online = false;
+        bool fault = true;
         int gear = 0;
         int throttle = 0;
         int voltage = 0;
         int current = 0;
         int RPM = 0;
+
         int temp = 0;
-        int tempM1 = 0;
-        int tempM2 = 0;
-        int errorA = 0;
-        int errorb = 0;
-        bool online = false;
+        int tempM = 0;
+        uint8_t errorsA = 0;
+        uint8_t errorsB = 0;
+        uint8_t rDirection = 0;
+        uint8_t rCmd = 0;
+        uint8_t rSwStatus = 0;
+        int rThrottle = 0;
+
+        bool enable = false;
+        bool reverse = false;
+        bool brakeAN = false;
+        int brakeThrottle = 0;
     };
     
     struct Lights
@@ -65,6 +76,7 @@ struct Vehicle
     struct Controls
     {
         // enum gear { P, R, N, D, L};
+        uint8_t state = 0;
         int gear = 0;
         int throttle = 0;
         int regen = 0;

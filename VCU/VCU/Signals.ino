@@ -43,6 +43,7 @@ void Signals::service(void)
   setHorn();
 }
 
+
 void Signals::restart(void)
 {
   // TODO

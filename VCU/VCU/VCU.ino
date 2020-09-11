@@ -29,23 +29,21 @@ void setup()
   Serial.begin(9600);
   // put your setup code here, to run once:
   vehicle.state = 0;
-
   delay(200);
+
   appSetup();
   Serial.println("App setup");
-
-  //
   CANb.setup();
   Serial.println("CAN setup");
   signals.setup();
   Serial.println("Signals setup");
-  //  motor.setup();
   monitor.setup();
   Serial.println("Monitor setup");
   dash.setup();
   Serial.println("Dash setup");
   motor.setup();
   Serial.println("Motor setup");
+
   delayStart = millis();
 
   xTaskCreatePinnedToCore(loop1, "loop1", 4096, NULL, 1, NULL, 0);
@@ -54,7 +52,10 @@ void setup()
 void loop()
 {
   StartTime = millis();
-  // put your main code here, to run repeatedly:
+
+  if ( vehicle.controls.state==0 && vehicle.controls.gear==0 ) {
+    vehicle.controls.state = 1;
+  }
 
 
   //  Serial.print("MONITOR");

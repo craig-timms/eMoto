@@ -17,6 +17,8 @@ struct Vehicle
         int contactor = 0;
         int discharge = 0;
         int precharge = 0;
+        bool fault = true;
+        bool online = false;
     };
     
     struct Charger
@@ -36,6 +38,7 @@ struct Vehicle
     {
         bool enabled = false;
         bool online = false;
+        bool fault = true;
         int gear = 0;
         int throttle = 0;
         int voltage = 0;
@@ -70,6 +73,7 @@ struct Vehicle
     struct Controls
     {
         // enum gear { P, R, N, D, L};
+        uint8_t state = 0;
         int gear = 0;
         int throttle = 0;
         int regen = 0;
